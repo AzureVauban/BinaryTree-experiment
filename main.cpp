@@ -60,7 +60,7 @@ namespace BINARY_TREE
         // If there is a right child, then the maximum value is in the right subtree
         if (root->right)
         {
-            remove_maxBTNode(root->right, removed);
+            remove_maxBTNode(root->right, removed); //SEGMENT FAULT FROM REMOVE_MAXBTNODE()
         }
         else
         {
@@ -188,14 +188,33 @@ namespace BINARY_TREE
     template <typename T>
     void delete_top_BTNode(std::vector<T> &values)
     {
-        // create a tree
+        // BTNODE<T> is defined as follows:
+        // template <typename T>
+        // struct BTNode
+        // {
+        //     BTNode<T> *right = nullptr,
+        //               *left = nullptr;
+        //     T data;
+        //     ~BTNode()
+        //     {
+        //         if (right)
+        //         {
+        //             delete right;
+        //             right = nullptr;
+        //         }
+        //         if (left)
+        //         {
+        //             delete left;
+        //             left = nullptr;
+        //         }
+        //     }
+        // }; // BTNode
         BTNode<T> *root = nullptr;
         for (int i = 0; i < values.size(); i++)
         {
             insert_BTNode(root, values.at(i));
         }
-        cout << "ROOT ~:        "; // TODO
-        //cout << "ROOT ~:        "; // TODO
+        cout << "ROOT ~:        ";
         while (root) //CAUSES SEGMENTATION FAULTS
         {
             BTNode<T> *&old_root = root; // reference to the root
@@ -224,7 +243,8 @@ int main()
         comparisonqueue          // FILO;
         ;
     BINARY_TREE::BTNode<int> *head = nullptr;
-    int expected_tree_size = randomBetween(10, 50);
+    const int expected_tree_size = // randomBetween(10, 50);
+        10;
     cout << "Expected size of Binary Tree: " << expected_tree_size << endl;
     //    cout << "Current size of Binary Tree: " << size_BTNode(head) << endl;
 
@@ -257,6 +277,7 @@ int main()
     cout << "TREE ORDER:    ";
     BINARY_TREE::output_tree(head);
     cout << endl;
+    BINARY_TREE::delete_top_BTNode(comparisonstack);
     if (DOSORTCASE)
     {
         // sort vector from least to greatest
@@ -310,7 +331,7 @@ int main()
         cout << endl;
     }
 
-    BINARY_TREE::delete_top_BTNode(comparisonstack);
+    
     if (head)
     {
         delete head;
