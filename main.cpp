@@ -182,6 +182,24 @@ namespace BINARY_TREE
         }
     }
 
+    template <typename T>
+    void delete_top_BTNode(std::vector<T>& values)
+    {
+        // create a tree
+        BTNode<T> *root = nullptr;
+        for (int i = 0; i < values.size(); i++) {
+            insert_BTNode(root, values.at(i));
+        }
+        cout << "ROOT ~:"; //TODO FINISH
+            while (root) //CAAUSES INFINITE LOOP
+            {
+              //set the root to the right child
+            BTNode<T> *temp = root;
+            //overwrite the root with the right child
+            cout << root->data << " ";
+            }
+        cout << endl;
+    }
 }
 int main()
 {
@@ -203,11 +221,11 @@ int main()
         if (!BINARY_TREE::isduplicate(head, chosen_value))
         {
             comparisonstack.emplace_back(chosen_value);
-            //add to the front of the queue
+            // add to the front of the queue
             comparisonqueue.insert(comparisonqueue.begin(), chosen_value);
-            //            comparsionqueue2.emplace_back(chosen_value);
+
             BINARY_TREE::insert_BTNode(head, chosen_value);
-            //            cout << chosen_value << " ";
+
             cout << chosen_value << " ";
         }
     }
@@ -224,7 +242,6 @@ int main()
     cout << "TREE ORDER:    ";
     BINARY_TREE::output_tree(head);
     cout << endl;
-
     if (DOSORTCASE)
     {
         // sort vector from least to greatest
@@ -278,7 +295,8 @@ int main()
         cout << endl;
     }
 
-       if (head)
+    //BINARY_TREE::delete_top_BTNode(comparisonstack);
+    if (head)
     {
         delete head;
         cout << endl;
