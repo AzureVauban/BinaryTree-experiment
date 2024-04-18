@@ -60,7 +60,7 @@ namespace BINARY_TREE
         // If there is a right child, then the maximum value is in the right subtree
         if (root->right)
         {
-            remove_maxBTNode(root->right, removed); //SEGMENT FAULT FROM REMOVE_MAXBTNODE()
+            remove_maxBTNode(root->right, removed); // SEGMENT FAULT FROM REMOVE_MAXBTNODE()
         }
         else
         {
@@ -215,20 +215,22 @@ namespace BINARY_TREE
             insert_BTNode(root, values.at(i));
         }
         cout << "ROOT ~:        ";
-        while (root) //CAUSES SEGMENTATION FAULTS
+        while (root) // CAUSES SEGMENTATION FAULTS
         {
-            BTNode<T> *&old_root = root; // reference to the root
-            BTNode<T> *& right_subtree = root->right;
-            root = root->left;
-            // remove the right subtree
-            cout << old_root->data << " ";
-            while (right_subtree)
-            {
-                cout << right_subtree->data << " ";
-                remove_maxBTNode(right_subtree, right_subtree->data);
+            cout << root->data << " ";
+            if (root->left && root->right) {
+            
+            } else if (root->left) {
+
+            }  else { // if there is only a right subtree
+                //push values in the right subtree, remove the rightmost value
+                BTNode<T>*& temp = root->right;
+                root->data = temp->data;
+                while (temp->right) {
+                    temp->data = temp->right->data
+                    temp = temp->right;
+                }
             }
-            delete old_root;
-            old_root = nullptr;
         }
         cout << endl;
         delete root;
@@ -331,7 +333,6 @@ int main()
         cout << endl;
     }
 
-    
     if (head)
     {
         delete head;
