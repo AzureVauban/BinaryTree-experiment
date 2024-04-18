@@ -1,3 +1,6 @@
+/*
+none main branch
+*/
 #include <iostream>
 #include <random>
 #include <vector>
@@ -183,22 +186,34 @@ namespace BINARY_TREE
     }
 
     template <typename T>
-    void delete_top_BTNode(std::vector<T>& values)
+    void delete_top_BTNode(std::vector<T> &values)
     {
         // create a tree
         BTNode<T> *root = nullptr;
-        for (int i = 0; i < values.size(); i++) {
+        for (int i = 0; i < values.size(); i++)
+        {
             insert_BTNode(root, values.at(i));
         }
-        cout << "ROOT ~:"; //TODO FINISH
-            while (root) //CAAUSES INFINITE LOOP
+        cout << "ROOT ~:        "; // TODO
+        //cout << "ROOT ~:        "; // TODO
+        while (root) //CAUSES SEGMENTATION FAULTS
+        {
+            BTNode<T> *&old_root = root; // reference to the root
+            BTNode<T> *& right_subtree = root->right;
+            root = root->left;
+            // remove the right subtree
+            cout << old_root->data << " ";
+            while (right_subtree)
             {
-              //set the root to the right child
-            BTNode<T> *temp = root;
-            //overwrite the root with the right child
-            cout << root->data << " ";
+                cout << right_subtree->data << " ";
+                remove_maxBTNode(right_subtree, right_subtree->data);
             }
+            delete old_root;
+            old_root = nullptr;
+        }
         cout << endl;
+        delete root;
+        root = nullptr;
     }
 }
 int main()
@@ -295,7 +310,7 @@ int main()
         cout << endl;
     }
 
-    //BINARY_TREE::delete_top_BTNode(comparisonstack);
+    BINARY_TREE::delete_top_BTNode(comparisonstack);
     if (head)
     {
         delete head;
