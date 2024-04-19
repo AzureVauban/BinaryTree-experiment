@@ -225,6 +225,44 @@ namespace BINARY_TREE
         root = nullptr;
     }
 }
+
+
+namespace PRIORITYQUEUE{
+template <typename T>
+struct PriorityQueue{
+    BINARY_TREE::BTNode<T> *root = nullptr;
+
+    void enqueue(T value){ //GREATER OR EQUAL TO
+        // not implemented
+        BINARY_TREE::insert_BTNode(root, value);
+    }
+    T dequeue(){
+        // not implemented
+        BINARY_TREE::remove_maxBTNode(root, root->data);
+    }
+    BTNode<T> peek()
+    {
+        // not implemented
+        return root->data;
+    }
+    void upward_heapify() //RESORT THE QUEUE
+    {
+        // not implemented
+    }
+    private:
+    void force_complete(){
+        // dequeue values into a list
+        // 
+    }
+    ~PriorityQueue(){
+        if(root){
+            delete root;
+            root = nullptr;
+        }
+    }
+
+};
+}
 int main()
 {
     const bool DOSORTCASE = false;
