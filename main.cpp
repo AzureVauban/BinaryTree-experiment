@@ -218,19 +218,7 @@ namespace BINARY_TREE
         while (root) // CAUSES SEGMENTATION FAULTS
         {
             cout << root->data << " ";
-            if (root->left && root->right) {
-            
-            } else if (root->left) {
-
-            }  else { // if there is only a right subtree
-                //push values in the right subtree, remove the rightmost value
-                BTNode<T>*& temp = root->right;
-                root->data = temp->data;
-                while (temp->right) {
-                    temp->data = temp->right->data
-                    temp = temp->right;
-                }
-            }
+            // prioritize rightmost for returning
         }
         cout << endl;
         delete root;
@@ -242,8 +230,7 @@ int main()
     const bool DOSORTCASE = false;
     // USE BREATH-FIRST ALGORITHM TO BALANCE THE BINARY TREE
     vector<int> comparisonstack, // FIFO
-        comparisonqueue          // FILO;
-        ;
+        comparisonqueue;         // FILO
     BINARY_TREE::BTNode<int> *head = nullptr;
     const int expected_tree_size = // randomBetween(10, 50);
         10;
