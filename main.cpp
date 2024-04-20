@@ -226,44 +226,41 @@ namespace BINARY_TREE
     }
 }
 
-
-namespace PRIORITYQUEUE{
 template <typename T>
-struct PriorityQueue{
+struct PriorityQueue
+{
+    // parent is never less than the item of its children
+private:
     BINARY_TREE::BTNode<T> *root = nullptr;
 
-    void enqueue(T value){ //GREATER OR EQUAL TO
-        // not implemented
-        BINARY_TREE::insert_BTNode(root, value);
-    }
-    T dequeue(){
-        // not implemented
-        BINARY_TREE::remove_maxBTNode(root, root->data);
-    }
-    BTNode<T> peek()
+public:
+    PriorityQueue()
     {
-        // not implemented
-        return root->data;
+        this->root = nullptr;
     }
-    void upward_heapify() //RESORT THE QUEUE
+
+public:
+    void enqueue(T value)
     {
-        // not implemented
+        // GREATER OR EQUAL TO goes right
+        // LESS THAN goes left
     }
-    private:
-    void force_complete(){
-        // dequeue values into a list
-        // 
-    }
-    ~PriorityQueue(){
-        if(root){
+    bool isempty() const { return !this->root; }
+    void dequeue() {}
+
+public:
+    ~PriorityQueue()
+    {
+        if (root)
+        {
+            cout << "[" << root->data << "]";
             delete root;
             root = nullptr;
         }
     }
-
 };
-}
-int main()
+
+void temp()
 {
     const bool DOSORTCASE = false;
     // USE BREATH-FIRST ALGORITHM TO BALANCE THE BINARY TREE
@@ -364,6 +361,20 @@ int main()
         cout << endl;
         head = nullptr;
     }
+}
+int main()
+{
+    PriorityQueue<int> greatestheap;
+    for (int i = 0; i != 40; i++)
+    {
+        int value = randomBetween(0, 100);
+        greatestheap.enqueue(value);
+        cout << value << " ";
+    }
+    cout << endl;
+    // greatestheap.enqueue(10);
+    // greatestheap.dequeue();
+    cout << endl;
     cout << "terminating process" << endl;
     return 0;
 }
