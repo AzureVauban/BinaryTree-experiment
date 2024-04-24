@@ -1,10 +1,31 @@
-/*
-none main branch
-*/
-#include <iostream>
+
+#include "heap.h"
+#include "binary_tree.h"
 #include <random>
-#include <vector>
-using namespace std;
+
+template <typename T>
+struct priorityqueue{
+    std::vector<T> heap;
+    explicit priorityqueue() {
+        heap = {};
+    }
+    explicit priorityqueue(const std::vector<T>&values) {
+        for (int i = 0; i < values.size();i++)
+        {
+            heap.emplace_back(values.at(i));
+        }
+    }
+    T enqueue(T value)
+    {
+        heap.emplace_back(value);
+    }
+    ~priorityqueue() {
+        // deallocate heap but since its a vector 
+        // c++ does it automatically
+        std::cout << "deallocated object at " << this << std::endl;
+    }
+
+};  
 int randomBetween(int a, int b)
 {
     std::random_device rd;                       // obtain a random number from hardware
@@ -14,339 +35,9 @@ int randomBetween(int a, int b)
     return distr(gen); // generate numbers
 }
 
-namespace BINARY_TREE
-{
-    //  binary tree functions
-    template <typename T>
-    struct BTNode
-    {
-        BTNode<T> *right = nullptr,
-                  *left = nullptr;
-        T data;
-        ~BTNode()
-        {
-            if (right)
-            {
-                delete right;
-                right = nullptr;
-            }
-            if (left)
-            {
-                delete left;
-                left = nullptr;
-            }
-        }
-    }; // BTNode
-    template <typename T>
-    bool isduplicate(BTNode<T> *&root, T value)
-    {
-        if (!root)
-        {
-            return false;
-        }
-        if (root->data == value)
-        {
-            return true;
-        }
-        return isduplicate(root->left, value) || isduplicate(root->right, value);
-    }
-    template <typename T>
-    void remove_maxBTNode(BTNode<T> *&root, T removed)
-    {
-        // Base case: if the tree is empty, do nothing
-        if (!root)
-            return;
-
-        // If there is a right child, then the maximum value is in the right subtree
-        if (root->right)
-        {
-            remove_maxBTNode(root->right, removed); // SEGMENT FAULT FROM REMOVE_MAXBTNODE()
-        }
-        else
-        {
-            removed = root->data;
-            BTNode<T> *temp = root->left;
-            delete root;
-            root = temp;
-        }
-    }
-    template <typename T>
-    void insert_BTNode(BTNode<T> *&root, T value)
-    {
-        // Create a new node
-        BTNode<T> *newNode = new BTNode<T>;
-        newNode->data = value;
-
-        // Special case: empty tree
-        if (!root)
-        {
-            root = newNode;
-        }
-        else
-        {
-            BTNode<T> *parentNode = nullptr;
-            BTNode<T> *currentNode = root;
-            while (currentNode)
-            {
-                parentNode = currentNode;
-                if (value < currentNode->data)
-                {
-                    currentNode = currentNode->left;
-                }
-                else if (value > currentNode->data)
-                {
-                    currentNode = currentNode->right;
-                }
-                else
-                {
-                    delete newNode;
-                    newNode = nullptr;
-                }
-            }
-            if (value < parentNode->data)
-            {
-                parentNode->left = newNode;
-            }
-            else
-            {
-                parentNode->right = newNode;
-            }
-        }
-    }
-    template <typename T>
-    int size_BTNode(BTNode<T> *&root)
-    {
-        if (!root)
-        {
-            return 0;
-        }
-        int subtreesize = size_BTNode(root->right);
-        subtreesize += size_BTNode(root->left);
-        return subtreesize + 1;
-    }
-
-    template <typename T>
-    void output_tree(BTNode<T> *&root)
-    {
-        // outs the tree in te same order as deconstruction
-        if (root)
-        {
-            output_tree(root->right);
-            output_tree(root->left);
-            cout << root->data << " ";
-        }
-    }
-    template <typename T>
-    void remove_BTNode(BTNode<T> *&root, T value)
-    {
-        if (!root)
-        {
-
-            if (value < root->data)
-            {
-                remove_BTNode(root->left, value);
-            }
-            else if (value > root->data)
-            {
-                remove_BTNode(root->right, value);
-            }
-            else
-            {
-                if (!root->left && !root->right)
-                {
-                    delete root;
-                    root = nullptr;
-                }
-                else if (root->left && !root->right)
-                {
-                    BTNode<T> *temp = root;
-                    root = root->left;
-                    temp->left = nullptr;
-                    delete temp;
-                }
-                else if (!root->left && root->right)
-                {
-                    BTNode<T> *temp = root;
-                    root = root->right;
-                    temp->right = nullptr;
-                    delete temp;
-                }
-                else
-                {
-                    BTNode<T> *temp = root->right;
-                    while (temp && temp->left)
-                    {
-                        temp = temp->left;
-                    }
-                    root->data = temp->data;
-                    remove_BTNode(root->right, temp->data);
-                }
-            }
-        }
-    }
-    template <typename T>
-    bool iscomplete(BTNode<T> *&root)
-    {
-
-        if (!root->left && !root->right)
-        {
-            return true;
-        }
-        else if (root->left && root->right)
-        {
-            return iscomplete(root->left) && iscomplete(root->right);
-        }
-        else
-        {
-            return false;
-        }
-        return false;
-    }
-
-    template <typename T>
-    void delete_top_BTNode(std::vector<T> &values)
-    {
-        // BTNODE<T> is defined as follows:
-        // template <typename T>
-        // struct BTNode
-        // {
-        //     BTNode<T> *right = nullptr,
-        //               *left = nullptr;
-        //     T data;
-        //     ~BTNode()
-        //     {
-        //         if (right)
-        //         {
-        //             delete right;
-        //             right = nullptr;
-        //         }
-        //         if (left)
-        //         {
-        //             delete left;
-        //             left = nullptr;
-        //         }
-        //     }
-        // }; // BTNode
-        BTNode<T> *root = nullptr;
-        for (int i = 0; i < values.size(); i++)
-        {
-            insert_BTNode(root, values.at(i));
-        }
-        cout << "ROOT ~:        ";
-        while (root) // CAUSES SEGMENTATION FAULTS
-        {
-            cout << root->data << " ";
-            // prioritize rightmost for returning
-        }
-        cout << endl;
-        delete root;
-        root = nullptr;
-    }
-}
-
-template <typename T>
-struct PriorityQueue
-{
-    /*
-    Node: i
-    Left child: 2i + 1
-    Right child: 2i + 2
-    parent: (i-1)/2
-    */
-
-    typedef std::size_t size_type;
-
-private:
-    static const size_type DEFAULT_CAPACITY = 1;
-    template <typename TT>
-    struct PQNode : public BINARY_TREE::BTNode<T>
-    {
-        size_type index;
-
-    public:
-        PQNode(TT value, std::size_t index)
-        {
-            this->data = value;
-            this->index = index;
-            this->left = nullptr;
-            this->right = nullptr;
-        }
-    };
-    PQNode<T> *heap;
-
-public:
-    PriorityQueue()
-    {
-        heap = nullptr;
-    }
-    ~PriorityQueue()
-    {
-        if (heap)
-        {
-            delete heap;
-            heap = nullptr;
-        }
-    }
-    bool isempty() const { return !this->heap; }
-
-    //MEMBER FUNCTIONS
-    void enqueue(T value, size_type priority)
-    {
-        if (isempty())
-        {
-            this->heap = new PQNode<T>(value, priority);
-            // this->heap->data = value;
-            // this->heap->index = priority;
-        } else {
-        }
-    }
-    T peak()
-    {
-        if (this->isempty())
-        {
-            return T();
-        }
-        else
-        {
-            return this->heap->data;
-        }
-    }
-    void update() {
-        //NOT IMPLEMENTED YET
-    }
-};
-// template <typename T>
-// struct PriorityQueue
-//{
-//     // parent is never less than the item of its children
-//     typedef int value_type;
-//     typedef size_t size_type;
-//     static const size_type DEFAULT_CAPACITY = 1;
-//     // CONSTRUCTORS AND DESTRUCTOR
-// private:
-//     struct ItemType
-//     {
-//         value_type data;
-//         size_type priority;
-//     };
-//     ItemType *Heap;
-//     size_type = index;
-//
-// public:
-// PriorityQueue(size_type capacity) {
-//     Heap = new ItemType[capacity];
-// }
-//~PriorityQueue() {
-//     delete [] Heap;
-//     Heap = nullptr;
-// }
-// void enqueue(const size_type& entry,size_type priority){
-//
-// }
-// };
-//
 void temp()
 {
+    using namespace std;
     const bool DOSORTCASE = false;
     // USE BREATH-FIRST ALGORITHM TO BALANCE THE BINARY TREE
     vector<int> comparisonstack, // FIFO
@@ -447,16 +138,34 @@ void temp()
         head = nullptr;
     }
 }
+
+
+
 int main()
 {
-    PriorityQueue<int> greatestheap;
-    for (int i = 0; i < 10; i++)
+    std::vector<int> nums = {};
+    for (int i = 0; i < randomBetween(10, 100);i++)
     {
-        int value = randomBetween(0, 100);
-        greatestheap.enqueue(value, i);
+        int chosen_value = randomBetween(0, 100);
+        nums.emplace_back(chosen_value);
+        std::cout << chosen_value << " ";
     }
-
-    cout << greatestheap.peak() << endl;
+    std::cout << std::endl;
+    HEAP::heapSort(nums);
+    for (int i = 0; i < nums.size(); i++)
+    {
+        
+        std::cout << nums.at(i) << " ";
+    }
+    std::cout << std::endl;
+    //make a balanced tree
+    BINARY_TREE::BTNode<int> *root = nullptr;
+    for (int i = 0; i < nums.size(); i++)
+    {
+        BINARY_TREE::insert_BTNode(root, nums.at(i));
+    }
+    delete root;
+    root = nullptr;
     std::cout << "terminating process" << std::endl;
     return 0;
-}
+    }
