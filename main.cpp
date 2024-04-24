@@ -18,6 +18,7 @@ struct priorityqueue{
     T enqueue(T value)
     {
         heap.emplace_back(value);
+    
     }
     ~priorityqueue() {
         // deallocate heap but since its a vector 
