@@ -184,6 +184,24 @@ namespace BINARY_TREE
             }
         }
     }
+    template <typename T>
+    bool iscomplete(BTNode<T> *&root)
+    {
+
+        if (!root->left && !root->right)
+        {
+            return true;
+        }
+        else if (root->left && root->right)
+        {
+            return iscomplete(root->left) && iscomplete(root->right);
+        }
+        else
+        {
+            return false;
+        }
+        return false;
+    }
 
     template <typename T>
     void delete_top_BTNode(std::vector<T> &values)
@@ -229,37 +247,104 @@ namespace BINARY_TREE
 template <typename T>
 struct PriorityQueue
 {
-    // parent is never less than the item of its children
+    /*
+    Node: i
+    Left child: 2i + 1
+    Right child: 2i + 2
+    parent: (i-1)/2
+    */
+
+    typedef std::size_t size_type;
+
 private:
-    BINARY_TREE::BTNode<T> *root = nullptr;
+    static const size_type DEFAULT_CAPACITY = 1;
+    template <typename TT>
+    struct PQNode : public BINARY_TREE::BTNode<T>
+    {
+        size_type index;
+
+    public:
+        PQNode(TT value, std::size_t index)
+        {
+            this->data = value;
+            this->index = index;
+            this->left = nullptr;
+            this->right = nullptr;
+        }
+    };
+    PQNode<T> *heap;
 
 public:
     PriorityQueue()
     {
-        this->root = nullptr;
+        heap = nullptr;
     }
-
-public:
-    void enqueue(T value)
-    {
-        // GREATER OR EQUAL TO goes right
-        // LESS THAN goes left
-    }
-    bool isempty() const { return !this->root; }
-    void dequeue() {}
-
-public:
     ~PriorityQueue()
     {
-        if (root)
+        if (heap)
         {
-            cout << "[" << root->data << "]";
-            delete root;
-            root = nullptr;
+            delete heap;
+            heap = nullptr;
         }
     }
-};
+    bool isempty() const { return !this->heap; }
 
+    //MEMBER FUNCTIONS
+    void enqueue(T value, size_type priority)
+    {
+        if (isempty())
+        {
+            this->heap = new PQNode<T>(value, priority);
+            // this->heap->data = value;
+            // this->heap->index = priority;
+        } else {
+        }
+    }
+    T peak()
+    {
+        if (this->isempty())
+        {
+            return T();
+        }
+        else
+        {
+            return this->heap->data;
+        }
+    }
+    void update() {
+        //NOT IMPLEMENTED YET
+    }
+};
+// template <typename T>
+// struct PriorityQueue
+//{
+//     // parent is never less than the item of its children
+//     typedef int value_type;
+//     typedef size_t size_type;
+//     static const size_type DEFAULT_CAPACITY = 1;
+//     // CONSTRUCTORS AND DESTRUCTOR
+// private:
+//     struct ItemType
+//     {
+//         value_type data;
+//         size_type priority;
+//     };
+//     ItemType *Heap;
+//     size_type = index;
+//
+// public:
+// PriorityQueue(size_type capacity) {
+//     Heap = new ItemType[capacity];
+// }
+//~PriorityQueue() {
+//     delete [] Heap;
+//     Heap = nullptr;
+// }
+// void enqueue(const size_type& entry,size_type priority){
+//
+// }
+// };
+//
 void temp()
 {
     const bool DOSORTCASE = false;
@@ -365,16 +450,13 @@ void temp()
 int main()
 {
     PriorityQueue<int> greatestheap;
-    for (int i = 0; i != 40; i++)
+    for (int i = 0; i < 10; i++)
     {
         int value = randomBetween(0, 100);
-        greatestheap.enqueue(value);
-        cout << value << " ";
+        greatestheap.enqueue(value, i);
     }
-    cout << endl;
-    // greatestheap.enqueue(10);
-    // greatestheap.dequeue();
-    cout << endl;
-    cout << "terminating process" << endl;
+
+    cout << greatestheap.peak() << endl;
+    std::cout << "terminating process" << std::endl;
     return 0;
 }
