@@ -1,32 +1,7 @@
 
-#include "heap.h"
-#include "binary_tree.h"
+#include <iostream>
 #include <random>
 
-template <typename T>
-struct priorityqueue{
-    std::vector<T> heap;
-    explicit priorityqueue() {
-        heap = {};
-    }
-    explicit priorityqueue(const std::vector<T>&values) {
-        for (int i = 0; i < values.size();i++)
-        {
-            heap.emplace_back(values.at(i));
-        }
-    }
-    T enqueue(T value)
-    {
-        heap.emplace_back(value);
-    
-    }
-    ~priorityqueue() {
-        // deallocate heap but since its a vector 
-        // c++ does it automatically
-        std::cout << "deallocated object at " << this << std::endl;
-    }
-
-};  
 int randomBetween(int a, int b)
 {
     std::random_device rd;                       // obtain a random number from hardware
@@ -36,137 +11,275 @@ int randomBetween(int a, int b)
     return distr(gen); // generate numbers
 }
 
-void temp()
+//@namespace BINARY_TREE
+//@{
+//@    //  binary tree functions
+//@    template <typename A>
+//@    struct BTNode
+//@    {
+//@        BTNode<A> *right = nullptr,
+//@                  *left = nullptr;
+//@        A data;
+//@        ~BTNode()
+//@        {
+//@            if (right)
+//@            {
+//@                delete right;
+//@                right = nullptr;
+//@            }
+//@            if (left)
+//@            {
+//@                delete left;
+//@                left = nullptr;
+//@            }
+//@        }
+//@    }; // BTNode
+//@
+//@    template <typename A>
+//@    int size_BTNode(BTNode<A> *&root)
+//@    {
+//@        if (!root)
+//@        {
+//@            return 0;
+//@        }
+//@        int subtreesize = size_BTNode(root->right);
+//@        subtreesize += size_BTNode(root->left);
+//@        return subtreesize + 1;
+//@    }
+//@
+//@    template <typename A>
+//@
+//@
+//@    template <typename A>
+//@    void delete_top_BTNode(std::vector<A> &values)
+//@    {
+//@        BTNode<A> *root = nullptr;
+//@        for (int i = 0; i < values.size(); i++)
+//@        {
+//@            insert_BTNode(root, values.at(i));
+//@        }
+//@        std::cout << "ROOT ~:        ";
+//@        while (root) // CAUSES SEGMENTATION FAULTS
+//@        {
+//@            std::cout << root->data << " ";
+//@            // prioritize rightmost for returning
+//@        }
+//@        std::cout << std::endl;
+//@        delete root;
+//@        root = nullptr;
+//@    }
+//@};
+
+template <class A>
+struct BinaryTree
 {
-    using namespace std;
-    const bool DOSORTCASE = false;
-    // USE BREATH-FIRST ALGORITHM TO BALANCE THE BINARY TREE
-    vector<int> comparisonstack, // FIFO
-        comparisonqueue;         // FILO
-    BINARY_TREE::BTNode<int> *head = nullptr;
-    const int expected_tree_size = // randomBetween(10, 50);
-        10;
-    cout << "Expected size of Binary Tree: " << expected_tree_size << endl;
-    //    cout << "Current size of Binary Tree: " << size_BTNode(head) << endl;
-
-    // print in order of what a queue would look like
-    cout << "STACK ORDER:   ";
-    while (BINARY_TREE::size_BTNode(head) != expected_tree_size)
+private:
+    template <typename B>
+    struct BinaryTreeNode
     {
-        auto chosen_value = randomBetween(0, 100);
-        if (!BINARY_TREE::isduplicate(head, chosen_value))
+        BinaryTreeNode<B> *right = nullptr,
+                          *left = nullptr;
+        B data;
+        BinaryTreeNode(B value) : left(nullptr), right(nullptr), data(value) {}
+        ~BinaryTreeNode()
         {
-            comparisonstack.emplace_back(chosen_value);
-            // add to the front of the queue
-            comparisonqueue.insert(comparisonqueue.begin(), chosen_value);
-
-            BINARY_TREE::insert_BTNode(head, chosen_value);
-
-            cout << chosen_value << " ";
-        }
-    }
-    cout << endl;
-    // print in order of what a queue would look like
-    cout << "QUEUE ORDER:   ";
-    for (int i = comparisonqueue.size(); i > 0; i--)
-    {
-        cout << comparisonqueue.front() << " ";
-        comparisonqueue.erase(comparisonqueue.begin()); // remove the front value from the
-    }
-    cout << endl;
-    // print in order of what the tree deconstruction would look like
-    cout << "TREE ORDER:    ";
-    BINARY_TREE::output_tree(head);
-    cout << endl;
-    BINARY_TREE::delete_top_BTNode(comparisonstack);
-    if (DOSORTCASE)
-    {
-        // sort vector from least to greatest
-        for (int i = 0; i < comparisonstack.size(); i++)
-        {
-            for (int j = i + 1; j < comparisonstack.size(); j++)
+            if (right)
             {
-                if (comparisonstack[i] > comparisonstack[j])
-                {
-                    // Swap v[i] and v[j]
-                    int temp = comparisonstack[i];
-                    comparisonstack[i] = comparisonstack[j];
-                    comparisonstack[j] = temp;
-                }
+                delete right;
+                right = nullptr;
+            }
+            if (left)
+            {
+                delete left;
+                left = nullptr;
             }
         }
-        delete head;
-        head = nullptr;
-        if (comparisonstack.size() % 2 == 0)
+    };
+
+private:
+    BinaryTreeNode<A> *head;
+    size_t binary_tree_size;
+
+public:
+    // CONST MEMBER FUNCTIONS
+    BinaryTree() : head(nullptr), binary_tree_size(0) {}
+
+    size_t size() const { return static_cast<size_t>(this->binary_tree_size); }
+
+    bool isempty() const { return !this->head; }
+
+    bool iscomplete() const { return this->iscomplete(this->head); }
+
+    bool isduplicate(A value) const { return this->isduplicate(this->head, value); }
+
+    bool iscomplete() { return this->iscomplete_HELPER(this->head); }
+    // MUTATOR MEMBER FUNCTION
+    void insert(A value)
+    {
+        BinaryTreeNode<A> *root = this->head,
+                          *nNode = new BinaryTreeNode<A>(value);
+
+        // Special case: empty tree
+        if (!root)
         {
-            // get the greater value of the two middle indicies and swap it with the front value
-            int middle = comparisonstack.size() / 2;
-            int front = comparisonstack.at(0);
-            if (comparisonstack.at(middle) > comparisonstack.at(middle - 1))
+            root = nNode;
+            this->binary_tree_size += 1;
+            return;
+        }
+
+        BinaryTreeNode<A> *parentNode = root,
+                          *currentNode = root;
+        while (currentNode)
+        {
+            parentNode = currentNode;
+            if (value < currentNode->data)
             {
-                comparisonstack.at(0) = comparisonstack.at(middle);
-                comparisonstack.at(middle) = front;
+                currentNode = currentNode->left;
+            }
+            else if (value > currentNode->data)
+            {
+                currentNode = currentNode->right;
             }
             else
             {
-                comparisonstack.at(0) = comparisonstack.at(middle - 1);
-                comparisonstack.at(middle - 1) = front;
+                delete nNode;
+                nNode = nullptr;
             }
+        }
+        if (value < parentNode->data)
+        {
+            parentNode->left = nNode;
         }
         else
         {
-            // swap the front value with the exact middle value
-            int middle = comparisonstack.size() / 2;
-            int front = comparisonstack.at(0);
-            comparisonstack.at(0) = comparisonstack.at(middle);
-            comparisonstack.at(middle) = front;
+            parentNode->right = nNode;
         }
-        for (int i = 0; i < comparisonstack.size(); i++)
-        {
-            BINARY_TREE::insert_BTNode(head, comparisonstack.at(i));
-        }
-        // cout << "The binary tree has a size " << size(<int>head)<< endl;
-        // print in order of what the tree deconstruction would look like once sorted in ascending order
-        cout << "TREE (SORTED): ";
-        BINARY_TREE::output_tree(head);
-        cout << endl;
+        this->binary_tree_size += 1;
     }
 
-    if (head)
+    void remove(A value)
+    {
+        this->remove_HELPER(this->head, value);
+        this->binary_tree_size -= 1;
+    }
+
+    // MISC FUNCTIONS
+    void output_tree()
+    {
+        this->output_tree_HELPER(this->root);
+    }
+
+private: // PRIVATE HELPER FUNCTIONS
+    void remove_HELPER(BinaryTreeNode<A> *&root, A value)
+    {
+        if (!root)
+        {
+
+            if (value < root->data)
+            {
+                remove_HELPER(root->left, value);
+            }
+            else if (value > root->data)
+            {
+                remove_HELPER(root->right, value);
+            }
+            else
+            {
+                if (!root->left && !root->right)
+                {
+                    delete root;
+                    root = nullptr;
+                }
+                else if (root->left && !root->right)
+                {
+                    BinaryTreeNode<A> *temp = root;
+                    root = root->left;
+                    temp->left = nullptr;
+                    delete temp;
+                }
+                else if (!root->left && root->right)
+                {
+                    BinaryTreeNode<A> *temp = root;
+                    root = root->right;
+                    temp->right = nullptr;
+                    delete temp;
+                }
+                else
+                {
+                    BinaryTreeNode<A> *temp = root->right;
+                    while (temp && temp->left)
+                    {
+                        temp = temp->left;
+                    }
+                    root->data = temp->data;
+                    remove_HELPER(root->right, temp->data);
+                }
+            }
+        }
+    }
+
+    bool iscomplete_HELPER(BinaryTreeNode<A> *&root)
+    {
+
+        if (!root->left && !root->right)
+        {
+            return true;
+        }
+        else if (root->left && root->right)
+        {
+            return iscomplete_HELPER(root->left) && iscomplete_HELPER(root->right);
+        }
+        else
+        {
+            return false;
+        }
+        return false;
+    }
+
+    bool isduplicate_HELPER(BinaryTreeNode<A> *&root, A value)
+    {
+        if (!root)
+        {
+            return false;
+        }
+        if (root->data == value)
+        {
+            return true;
+        }
+        return isduplicate_HELPER(root->left, value) || isduplicate_HELPER(root->right, value);
+    }
+
+    void output_tree_HELPER(BinaryTreeNode<A> *&root)
+    {
+        // outs the tree in te same order as deconstruction
+        if (root)
+        {
+            output_tree_HELPER(root->right);
+            output_tree_HELPER(root->left);
+            std::cout << root->data << " ";
+        }
+    }
+
+public:
+    ~BinaryTree()
     {
         delete head;
-        cout << endl;
         head = nullptr;
     }
-}
-
-
+};
 
 int main()
 {
     std::vector<int> nums = {};
-    for (int i = 0; i < randomBetween(10, 100);i++)
+    BinaryTree<int> myBinaryTree;
+    for (int i = 0; i < randomBetween(10, 100); i++)
     {
         int chosen_value = randomBetween(0, 100);
         nums.emplace_back(chosen_value);
+        myBinaryTree.insert(chosen_value);
         std::cout << chosen_value << " ";
     }
     std::cout << std::endl;
-    HEAP::heapSort(nums);
-    for (int i = 0; i < nums.size(); i++)
-    {
-        
-        std::cout << nums.at(i) << " ";
-    }
-    std::cout << std::endl;
-    //make a balanced tree
-    BINARY_TREE::BTNode<int> *root = nullptr;
-    for (int i = 0; i < nums.size(); i++)
-    {
-        BINARY_TREE::insert_BTNode(root, nums.at(i));
-    }
-    delete root;
-    root = nullptr;
-    std::cout << "terminating process" << std::endl;
-    return 0;
-    }
+    std::cout << "SIZE OF BT TREE: " << myBinaryTree.size() << std::endl;
+    myBinaryTree.output_tree();
+}
