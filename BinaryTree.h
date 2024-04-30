@@ -56,7 +56,7 @@ namespace BINARYTREE
 
         bool iscomplete() { return this->iscomplete_HELPER(this->head); }
         // MUTATOR MEMBER FUNCTION
-        void insert(datatype_A value) { this->insert_HELPER(this->head,value); }
+        void insert(datatype_A value) { this->insert_HELPER(this->head, value); }
         void remove(datatype_A value)
         {
             this->remove_HELPER(this->head, value);
@@ -118,13 +118,52 @@ namespace BINARYTREE
             }
         }
 
-        void insert_HELPER(BinaryTreeNode<datatype_A> *&root, datatype_A value) {
+        void insert_HELPER(BinaryTreeNode<datatype_A> *&root, datatype_A value)
+        {
+            // Create a new node
+            BinaryTreeNode<datatype_A> *newNode = new BinaryTreeNode<datatype_A>;
+            newNode->data = value;
 
+            // Special case: empty tree
+            if (!root)
+            {
+                root = newNode;
+            }
+            else
+            {
+                BinaryTreeNode<datatype_A> *parentNode = nullptr,*currentNode = root;
+                while (currentNode)
+                {
+                    parentNode = currentNode;
+                    if (value < currentNode->data)
+                    {
+                        currentNode = currentNode->left;
+                    }
+                    else if (value > currentNode->data)
+                    {
+                        currentNode = currentNode->right;
+                    }
+                    else
+                    {
+                        delete newNode;
+                        newNode = nullptr;
+                    }
+                }
+                if (value < parentNode->data)
+                {
+                    parentNode->left = newNode;
+                }
+                else
+                {
+                    parentNode->right = newNode;
+                }
+            }
         }
-        
+
         bool iscomplete_HELPER(BinaryTreeNode<datatype_A> *&root)
         {
-            if (!root) {
+            if (!root)
+            {
                 return true;
             }
             if (!root->left && !root->right)
