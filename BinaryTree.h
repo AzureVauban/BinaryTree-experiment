@@ -32,24 +32,22 @@ public:
   // CONST MEMBER FUNCTIONS
   BinaryTree() : head(nullptr) {}
 
-  size_t size() { return this->size_HELPER(head); }
+  size_t size() { return size_HELPER(head); }
 
-  bool isempty() const { return !this->head; }
+  bool isempty() const { return !head; }
 
-  bool iscomplete() const { return this->iscomplete(this->head); }
+  bool iscomplete() const { return iscomplete(head); }
 
-  bool isduplicate(datatype_A value) const {
-    return this->isduplicate(this->head, value);
-  }
+  bool isduplicate(datatype_A value) const { return isduplicate(head, value); }
 
-  bool iscomplete() { return this->iscomplete_HELPER(this->head); }
+  bool iscomplete() { return iscomplete_HELPER(head); }
   // MUTATOR MEMBER FUNCTION
-  void insert(datatype_A value) { this->insert_HELPER(this->head, value); }
-  void remove(datatype_A value) { this->remove_HELPER(this->head, value); }
+  void insert(datatype_A value) { insert_HELPER(head, value); }
+  void remove(datatype_A value) { remove_HELPER(head, value); }
 
 private:
   void enqueue_all_nodes(
-      BinaryTreeNode<datatype_A> *root,
+      BinaryTreeNode<datatype_A> *&root,
       LINKEDLIST::Linked_List<BinaryTreeNode<datatype_A> *> &list) {
 
     if (root) {
@@ -65,7 +63,7 @@ private:
 
 public:
   // MISC FUNCTIONS
-  void output_tree() { this->output_tree_HELPER(this->head); }
+  void output_tree() { output_tree_HELPER(head); }
 
   void balance_tree() {
     LINKEDLIST::Linked_List<BinaryTreeNode<datatype_A> *> list;
@@ -75,26 +73,26 @@ public:
     for (int index = (list.size() / 2) - 1; index >= 0; index--) {
       heapify(list, index);
     }
-
+    // Output the list (for testing)
+    std::cout << "TEST REHEAP: ";
+    for (int index = 0; index < list.size(); index++) {
+      std::cout << list.get_node(index)->value->data << " ";
+    }
+    std::cout << std::endl;
     // Relink nodes
-    for (int index = 0; index < list.size()/2; index++) {
+    for (int index = 0; index < list.size() / 2; index++) {
       int left_child = (2 * index) + 1;
       int right_child = (2 * index) + 2;
+      bool isrightvalid = right_child >= 0 && right_child < list.size();
       BinaryTreeNode<datatype_A> *current = list.get_node(index)->value;
 
       // if (left_child < list.size()) {
       current->left = list.get_node(left_child)->value;
 
       //}
-      if (!right_child >= list.size()) {
-      current->right = list.get_node(right_child)->value;
+      if (!right_child >= list.size() && isrightvalid) {
+        current->right = list.get_node(right_child)->value;
       }
-    }
-
-    // Output the list (for testing)
-    std::cout << "TEST REHEAP: ";
-    for (int index = 0; index < list.size(); index++) {
-      std::cout << list.get_node(index)->value->data << " ";
     }
     std::cout << std::endl;
   }
@@ -159,7 +157,6 @@ private: // PRIVATE HELPER FUNCTIONS
       parentNode->right = newNode;
     }
   }
-  //}
 
   bool iscomplete_HELPER(BinaryTreeNode<datatype_A> *&root) {
     if (!root) {
@@ -206,9 +203,7 @@ private: // PRIVATE HELPER FUNCTIONS
   }
   void heapify(LINKEDLIST::Linked_List<BinaryTreeNode<datatype_A> *> &list,
                size_t index) {
-    size_t largest = index;
-    size_t left = (2 * index) + 1;
-    size_t right = (2 * index) + 2;
+    size_t largest = index, left = (2 * index) + 1, right = (2 * index) + 2;
 
     // Compare node with left child
     if (left < list.size() && list.get_node(left)->value->data >

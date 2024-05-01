@@ -1,5 +1,4 @@
 #include "BinaryTree.h"
-#include <ostream>
 #include <random>
 
 int randomBetween(int a, int b) {
@@ -11,19 +10,19 @@ int randomBetween(int a, int b) {
 }
 
 int main() {
-  //std::cout << int(7/2) << std::endl;
+  // std::cout << int(7/2) << std::endl;
   BINARYTREE::BinaryTree<int> myBinaryTree;
-  for (int i = 0; i != 10; i++) {
+  for (int i = 0; i != 5; i++) {
     int chosen_value = randomBetween(0, 100);
-   // std::cout << chosen_value << std::endl;
+    // std::cout << chosen_value << std::endl;
     myBinaryTree.insert(chosen_value);
-    //std::cout << i << std::endl;
+    // std::cout << i << std::endl;
   }
- // std::cout << "SIZE: " << myBinaryTree.size() << std::endl;
+  // std::cout << "SIZE: " << myBinaryTree.size() << std::endl;
   myBinaryTree.output_tree();
   std::cout << std::endl;
   myBinaryTree.balance_tree();
- // myBinaryTree.output_tree();
+  // myBinaryTree.output_tree();
   std::cout << std::endl;
   std::cout << "terminating process" << std::endl;
   return 0;
