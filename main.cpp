@@ -1,6 +1,4 @@
 #include "BinaryTree.h"
-#include "LinkedList.h"
-// #include "Queue.h"
 #include <random>
 
 int randomBetween(int a, int b) {
@@ -12,26 +10,19 @@ int randomBetween(int a, int b) {
 }
 
 int main() {
+  //std::cout << int(7/2) << std::endl;
   BINARYTREE::BinaryTree<int> myBinaryTree;
-  LINKEDLIST::Linked_List<int> myList;
-  // create a binary tree
-//@  for (int current_index = 0; current_index <= (myList.size() / 2);
-//@       current_index++)
-//@  // current_index++)
-//@  {
-//@    int left_child = (current_index * 2) + 1;
-//@    int right_child = (current_index_ * 2) + 2;
-//@    if (left_child < myList.size()) {
-//@      myBinaryTree.insert(left_child);
-//@    }
-//@    if (right_child < myList.size()) {
-//@      myBinaryTree.insert(right_child);
-//@    }
-//@  }
-  while (myBinaryTree.size() != randomBetween(5, 100)) {
-    myBinaryTree.insert(randomBetween(1, 100));
+  for (int i = 0; i < 5; i++) {
+    int chosen_value = randomBetween(0, 100);
+   // std::cout << chosen_value << std::endl;
+    myBinaryTree.insert(chosen_value);
+    //std::cout << i << std::endl;
   }
+ // std::cout << "SIZE: " << myBinaryTree.size() << std::endl;
+  myBinaryTree.output_tree();
+  std::cout << std::endl;
   myBinaryTree.balance_tree();
+  myBinaryTree.output_tree();
   std::cout << "terminating process" << std::endl;
   return 0;
 }

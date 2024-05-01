@@ -2,6 +2,7 @@
 #define BINARYTREE_H
 
 #include "LinkedList.h"
+#include <cstddef>
 // #include "Queue.h"
 
 namespace BINARYTREE {
@@ -26,13 +27,12 @@ private:
 
 private:
   BinaryTreeNode<datatype_A> *head;
-  size_t binary_tree_size;
 
 public:
   // CONST MEMBER FUNCTIONS
-  BinaryTree() : head(nullptr), binary_tree_size(0) {}
+  BinaryTree() : head(nullptr) {}
 
-  size_t size() const { return static_cast<size_t>(this->binary_tree_size); }
+  size_t size() { return this->size_HELPER(head); }
 
   bool isempty() const { return !this->head; }
 
@@ -45,40 +45,53 @@ public:
   bool iscomplete() { return this->iscomplete_HELPER(this->head); }
   // MUTATOR MEMBER FUNCTION
   void insert(datatype_A value) { this->insert_HELPER(this->head, value); }
-  void remove(datatype_A value) {
-    this->remove_HELPER(this->head, value);
-    this->binary_tree_size -= 1;
+  void remove(datatype_A value) { this->remove_HELPER(this->head, value); }
+
+private:
+  void enqueue_all_nodes(
+      BinaryTreeNode<datatype_A> *root,
+      LINKEDLIST::Linked_List<BinaryTreeNode<datatype_A> *> &list) {
+
+    if (root) {
+      list.insert(root);
+    }
+    if (root->left) {
+      enqueue_all_nodes(root->left, list);
+    }
+    if (root->right) {
+      enqueue_all_nodes(root->right, list);
+    }
   }
 
+public:
   // MISC FUNCTIONS
   void output_tree() { this->output_tree_HELPER(this->head); }
 
-
   void balance_tree() {
-    LINKEDLIST::Linked_List<int> list;
+    LINKEDLIST::Linked_List<BinaryTreeNode<datatype_A> *> list;
+    // enqueue all nodes
     enqueue_all_nodes(head, list);
+    for (int index = 0; index < list.size(); index++) {
+      BinaryTreeNode<datatype_A> *current = list.get_node(index)->value;
+      current->left = nullptr;
+      current->right = nullptr;
+    }
+    // reheapify nodes
+    for (int index = (size() / 2) - 1; index >= 0; index--) {
+        this->heapify(list, index);
+    }
+    // OUTPUT LIST
+    std::cout << "TEST REHEAP: ";
+    for (int index = 0; index < list.size(); index++) {
+      std::cout << list.get_node(index)->value->data << " ";
+    }
+    std::cout << std::endl;
+    // relink nodes
+    for (int index = 0; index <= (list.size() / 2) - 1; index++) {
+      int left_child = (2 * index) + 1;
+      int right_child = (2 * index) + 2;
+    }
     std::cout << "BREAKPOINT\n";
-//!    for (int index = 0; index < list.size(); index++) {
-//!      BinaryTreeNode<datatype_A> &current = list.get_node(index)->value;
-//!      current.left = nullptr;
-//!      current.right = nullptr;
-//!    }
-    // reheap the binary tree
-//!    std::cout << "PRE-HEAP: ";
-//!    // recreate the binary tree
-//!    this->head = temp.get_node(0)->value;
-//!    // temp.remove();
-//!    for (int index = 1; index <= (temp.size() / 2); index++) {
-//!      // each node is guaranteed a left child
-//!      int left_child = (index * 2) + 1;
-//!      int right_child = (index * 2) + 2;
-//!      if (left_child < temp.size()) {
-//!        temp.get_node(index)->left = temp.get_node(left_child);
-//!      }
-//!      if (right_child < temp.size()) {
-//!        temp.get_node(index)->right = temp.get_node(right_child);
-//!      }
-//!    }
   }
 
 private: // PRIVATE HELPER FUNCTIONS
@@ -119,25 +132,29 @@ private: // PRIVATE HELPER FUNCTIONS
     // Create a new node
     BinaryTreeNode<datatype_A> *newNode = new BinaryTreeNode<datatype_A>(value);
 
-    if (isempty()) {
-      this->head = newNode;
+    // Special case: empty tree
+    if (!root) {
+      root = newNode;
       return;
     }
 
-    if (value < root->data) {
-      if (root->left == nullptr) {
-        root->left = newNode;
-      } else {
-        insert_HELPER(root->left, value);
-      }
-    } else if (value > root->data) {
-      if (root->right == nullptr) {
-        root->right = newNode;
-      } else {
-        insert_HELPER(root->right, value);
+    BinaryTreeNode<datatype_A> *parentNode = root, *currentNode = root;
+    while (currentNode) {
+      parentNode = currentNode;
+      if (value < currentNode->data) {
+        currentNode = currentNode->left;
+      } // else if (value >= currentNode->data) {
+      else {
+        currentNode = currentNode->right;
       }
     }
+    if (value < parentNode->data) {
+      parentNode->left = newNode;
+    } else {
+      parentNode->right = newNode;
+    }
   }
+  //}
 
   bool iscomplete_HELPER(BinaryTreeNode<datatype_A> *&root) {
     if (!root) {
@@ -173,16 +190,32 @@ private: // PRIVATE HELPER FUNCTIONS
     }
   }
 
-  
-
-  void enqueue_all_nodes(BinaryTreeNode<datatype_A> *&root,
-                    LINKEDLIST::Linked_List<datatype_A> &list) {
-
+  size_t size_HELPER(BinaryTreeNode<datatype_A> *&root) {
     if (!root) {
-    enqueue_all_nodes(root->left, list);
-    enqueue_all_nodes(root->right, list);
+      return 0;
     }
-  
+    return static_cast<size_t>(size_HELPER(root->left) +
+                               size_HELPER(root->right) + 1);
+  }
+  void heapify(LINKEDLIST::Linked_List<BinaryTreeNode<datatype_A> *> list,
+               size_t index) {
+    int greatest = index, left = (2 * index) + 1, right = (2 * index) + 2;
+
+    // compare larger to children indicies
+    if (left < list.size() &&
+        list.get_node(left)->value->data > list.get_node(right)->value->data) {
+      greatest = left;
+    }
+    if (right < list.size() &&
+        list.get_node(right)->value->data > list.get_node(left)->value->data) {
+      greatest = right;
+    }
+
+    // if largest is not root
+    if (greatest != index) {
+      list.swap(index, greatest);
+    }
+    heapify(list, index);
   }
 
 public:
@@ -190,8 +223,6 @@ public:
     delete head;
     head = nullptr;
   }
-
-  
 };
 } // namespace BINARYTREE
 #endif // BINARYTREE_H
