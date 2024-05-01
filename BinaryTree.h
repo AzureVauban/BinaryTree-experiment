@@ -1,7 +1,7 @@
 #ifndef BINARYTREE_H
 #define BINARYTREE_H
 
-#include <iostream>
+#include "LinkedList.h"
 
 namespace BINARYTREE
 {
@@ -9,7 +9,7 @@ namespace BINARYTREE
     struct BinaryTree
     {
     private:
-        template <typename datatype_B>
+        template <class datatype_B>
         struct BinaryTreeNode
         {
             BinaryTreeNode<datatype_B> *right = nullptr,
@@ -42,14 +42,7 @@ namespace BINARYTREE
         size_t size() const { return static_cast<size_t>(this->binary_tree_size); }
 
         bool isempty() const { return !this->head; }
-        datatype_A peek() const
-        {
-            if (!this->head)
-            {
-                datatype_A();
-            }
-            return this->head->data;
-        }
+
         bool iscomplete() const { return this->iscomplete(this->head); }
 
         bool isduplicate(datatype_A value) const { return this->isduplicate(this->head, value); }
@@ -121,8 +114,8 @@ namespace BINARYTREE
         void insert_HELPER(BinaryTreeNode<datatype_A> *&root, datatype_A value)
         {
             // Create a new node
-            BinaryTreeNode<datatype_A> *newNode = new BinaryTreeNode<datatype_A>;
-            newNode->data = value;
+            BinaryTreeNode<datatype_A> *newNode = new BinaryTreeNode<datatype_A>(value);
+            // newNode->data = value;
 
             // Special case: empty tree
             if (!root)
@@ -131,7 +124,8 @@ namespace BINARYTREE
             }
             else
             {
-                BinaryTreeNode<datatype_A> *parentNode = nullptr,*currentNode = root;
+                BinaryTreeNode<datatype_A> *parentNode = root,
+                                           *currentNode = root;
                 while (currentNode)
                 {
                     parentNode = currentNode;
@@ -139,7 +133,7 @@ namespace BINARYTREE
                     {
                         currentNode = currentNode->left;
                     }
-                    else if (value > currentNode->data)
+                    else if (value >= currentNode->data)
                     {
                         currentNode = currentNode->right;
                     }
