@@ -69,36 +69,34 @@ public:
 
   void balance_tree() {
     LINKEDLIST::Linked_List<BinaryTreeNode<datatype_A> *> list;
-    // enqueue all nodes
     enqueue_all_nodes(head, list);
-    for (int index = 0; index < list.size(); index++) {
+
+    // Reheapify nodes
+    for (int index = (list.size() / 2) - 1; index >= 0; index--) {
+      heapify(list, index);
+    }
+
+    // Relink nodes
+    for (int index = 0; index < list.size()/2; index++) {
+      int left_child = (2 * index) + 1;
+      int right_child = (2 * index) + 2;
       BinaryTreeNode<datatype_A> *current = list.get_node(index)->value;
-      current->left = nullptr;
-      current->right = nullptr;
+
+      // if (left_child < list.size()) {
+      current->left = list.get_node(left_child)->value;
+
+      //}
+      if (!right_child >= list.size()) {
+      current->right = list.get_node(right_child)->value;
+      }
     }
-    // reheapify nodes
-    for (int index = 0; index < (size() / 2) - 1; index--) {
-      this->heapify(list, index);
-    }
-    // OUTPUT LIST
+
+    // Output the list (for testing)
     std::cout << "TEST REHEAP: ";
     for (int index = 0; index < list.size(); index++) {
       std::cout << list.get_node(index)->value->data << " ";
     }
     std::cout << std::endl;
-    // relink nodes
-    for (int index = 0; index < (size() / 2)-1; index++) {
-      {
-        int left_child = (2 * index) + 1;
-        int right_child = (2 * index) + 2;
-        BinaryTreeNode<datatype_A> *&current = list.get_node(index)->value;
-
-        current->left = list.get_node(left_child)->value;
-        current->right = list.get_node(right_child)->value;
-        //std::cout << "BREAKPOINT2\n";
-      }
-    }
-      std::cout << "BREAKPOINT\n";
   }
 
 private: // PRIVATE HELPER FUNCTIONS
@@ -188,13 +186,15 @@ private: // PRIVATE HELPER FUNCTIONS
            isduplicate_HELPER(root->right, value);
   }
 
-  void output_tree_HELPER(BinaryTreeNode<datatype_A> *&root) {
+  void output_tree_HELPER(const BinaryTreeNode<datatype_A> *root) {
     // outs the tree in the same order as deconstruction
-    if (root) {
-      output_tree_HELPER(root->right);
-      output_tree_HELPER(root->left);
-      std::cout << root->data << " ";
+    if (!root) {
+      return;
     }
+    output_tree_HELPER(root->left);
+
+    output_tree_HELPER(root->right);
+    std::cout << root->data << " ";
   }
 
   size_t size_HELPER(BinaryTreeNode<datatype_A> *&root) {

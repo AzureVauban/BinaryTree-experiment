@@ -23,7 +23,7 @@ int main() {
   myBinaryTree.output_tree();
   std::cout << std::endl;
   myBinaryTree.balance_tree();
-  myBinaryTree.output_tree();
+ // myBinaryTree.output_tree();
   std::cout << std::endl;
   std::cout << "terminating process" << std::endl;
   return 0;
