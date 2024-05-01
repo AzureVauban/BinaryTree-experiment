@@ -1,5 +1,5 @@
 #include "BinaryTree.h"
-#include "LinkedList.h"
+// #include "LinkedList.h"
 #include <random>
 
 int randomBetween(int a, int b) {
@@ -26,14 +26,30 @@ void binarytree_test() {
   std::cout << std::endl;
 }
 int main() {
-  LINKEDLIST::Linked_List<int> mynums;
-  for (int i = 0; i < 10; i++) {
-    std::cout << i << std::endl;
-    mynums.insert(i);
+  // LINKEDLIST::Linked_List<int> mynums;
+  // for (int i = 0; i < 10; i++) {
+  //   std::cout << i << std::endl;
+  //   mynums.insert(i);
+  // }
+  // for (int i = mynums.size() - 1; i >= 0; i--) {
+  //   std::cout << mynums[i] << std::endl;
+  // }
+
+  BINARYTREE::CompleteBinaryTree<int> myBinaryTree;
+  myBinaryTree.insert(12, 2);
+  myBinaryTree.insert(5, 1);
+  myBinaryTree.insert(1, 4);
+  myBinaryTree.insert(37, 5);
+  myBinaryTree.insert(64, 3);
+  myBinaryTree.insert(90, 6);
+  myBinaryTree.insert(97, 8);
+  myBinaryTree.insert(91, 7);
+
+  for (int i = 0; i < myBinaryTree.size(); i++) {
+    std::cout << myBinaryTree[i] << " ";
   }
-  for (int i = mynums.size() - 1; i >= 0; i--) {
-    std::cout << mynums[i] << std::endl;
-  }
+  // expected order: 97, 37, 91, 12, 5, 90, 64, 1
+  std::cout << std::endl;
   std::cout << "terminating process" << std::endl;
   return 0;
 }

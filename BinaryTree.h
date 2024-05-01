@@ -3,6 +3,8 @@
 
 #include "LinkedList.h"
 #include <cstddef>
+#include <iterator>
+#include <utility>
 // #include "Queue.h"
 
 namespace BINARYTREE {
@@ -217,9 +219,12 @@ template <class datatype_B> struct CompleteBinaryTree {
   template <class datatype_C> struct BinaryTreeNode {
   private:
     BinaryTreeNode<datatype_C> *right = nullptr, *left = nullptr;
+
+  public:
+    size_t priority;
     datatype_B data;
-    BinaryTreeNode(datatype_C value)
-        : left(nullptr), right(nullptr), data(value) {}
+    BinaryTreeNode(datatype_C value, size_t priority)
+        : left(nullptr), right(nullptr), data(value), priority(0) {}
     ~BinaryTreeNode() {
       if (right) {
         delete right;
@@ -231,21 +236,59 @@ template <class datatype_B> struct CompleteBinaryTree {
       }
     }
   };
-  LINKEDLIST::Linked_List<datatype_B> Heap;
+  LINKEDLIST::Linked_List<BinaryTreeNode<datatype_B>> Heap;
 
 public:
-  CompleteBinaryTree() : Heap(LINKEDLIST::Linked_List<datatype_B>()) {}
+  CompleteBinaryTree()
+      : Heap(LINKEDLIST::Linked_List<BinaryTreeNode<datatype_B>>()) {}
+  bool isempty() { return Heap.isempty(); }
 
-  void insert(size_t index = 0) { std::cout << "NOT IMPLEMENTED" << std::endl; }
-  void remove(size_t index = 0) { std::cout << "NOT IMPLEMENTED" << std::endl; }
-
-  void peak() { std::cout << "NOT IMPLEMENTED" << std::endl; }
-  void getvalueatnode(size_t index) {
-    std::cout << "NOT IMPLEMENTED" << std::endl;
+  size_t size() const { return static_cast<size_t>(Heap.size()); }
+  void insert(datatype_B value, size_t priority) {
+    // BinaryTreeNode<datatype_B> *newNode = ;
+    Heap.insert(BinaryTreeNode<datatype_B>(value, priority));
+    // reheapify the list baseed on priority
+    for (int i = 0; i < Heap.size() - 1; i++) {
+      heapify(Heap, i);
+    }
+    for (int i = 0; i < Heap.size(); i++) {
+      heapify(Heap, i);
+    }
   }
 
-  datatype_B &operator[](size_t index) { return Heap.get_node(index); }
+  void remove(size_t index = 0) {
+    if (!this->isempty()) {
+      Heap.remove(index);
+    }
+  }
 
+  datatype_B peak() { return Heap[0]; }
+  // datatype_B operator[](size_t index) const { return
+  // Heap.get_node(index)->value; }
+  datatype_B operator[](const size_t index) {
+    return Heap.get_node(index)->value.data;
+  }
+
+private:
+  void heapify(LINKEDLIST::Linked_List<BinaryTreeNode<datatype_B>> &list,
+               const size_t index) {
+    size_t max = index, left = (index * 2) + 1, right = left + 1;
+
+    if (left < list.size() && list[index].priority < list[left].priority) {
+      max = left;
+    }
+
+    if (right < list.size() && list[index].priority < list[right].priority) {
+      max = right;
+    }
+
+    if (max != index) {
+      list.swap(index, max);
+      heapify(list, max);
+    }
+  }
+
+public:
   ~CompleteBinaryTree() {
     // deallocate list
     while (!Heap.isempty()) {
@@ -253,6 +296,6 @@ public:
     }
   }
 };
-;
+
 } // namespace BINARYTREE
 #endif // BINARYTREE_H
