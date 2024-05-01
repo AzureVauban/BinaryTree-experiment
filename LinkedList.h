@@ -26,7 +26,7 @@ namespace LINKEDLIST
         Node<B> *head;
 
     public:
-                Linked_List() : head(nullptr) {}
+        Linked_List() : head(nullptr) {}
 
     private:
         // PRIVATE HELPER FUNCTIONS
@@ -47,6 +47,7 @@ namespace LINKEDLIST
             }
             return current;
         }
+
     public:
         Node<B> *get_node(size_t index)
         {

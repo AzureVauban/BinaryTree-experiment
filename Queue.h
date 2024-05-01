@@ -12,10 +12,26 @@ namespace QUEUE
 
     public:
         void Enqueue() { std::cout << "NOT IMPLEMENTED YET" << std::endl; }
-        void Dequeue() { std::cout << "NOT IMPLEMENTED YET" << std::endl; }
-        void Peek() { std::cout << "NOT IMPLEMENTED YET" << std::endl; }
-        void IsEmpty() { std::cout << "NOT IMPLEMENTED YET" << std::endl; }
-        void Size() { std::cout << "NOT IMPLEMENTED YET" << std::endl; }
+        B Dequeue()
+        {
+            std::cout << "NOT IMPLEMENTED YET" << std::endl;
+            return B();
+        }
+        B Peek()
+        {
+            std::cout << "NOT IMPLEMENTED YET" << std::endl;
+            return B();
+        }
+        void IsEmpty()
+        {
+            std::cout << "NOT IMPLEMENTED YET" << std::endl;
+            return false;
+        }
+        size_t Size()
+        {
+            std::cout << "NOT IMPLEMENTED YET" << std::endl;
+            return 0;
+        }
     };
 }
 #endif // QUEUE_H
