@@ -1,4 +1,5 @@
 #include "BinaryTree.h"
+#include "LinkedList.h"
 #include <random>
 
 int randomBetween(int a, int b) {
@@ -9,8 +10,7 @@ int randomBetween(int a, int b) {
   return distr(gen); // generate numbers
 }
 
-int main() {
-  // std::cout << int(7/2) << std::endl;
+void binarytree_test() {
   BINARYTREE::BinaryTree<int> myBinaryTree;
   for (int i = 0; i != 5; i++) {
     int chosen_value = randomBetween(0, 100);
@@ -21,9 +21,19 @@ int main() {
   // std::cout << "SIZE: " << myBinaryTree.size() << std::endl;
   myBinaryTree.output_tree();
   std::cout << std::endl;
- // myBinaryTree.balance_tree();
-  //myBinaryTree.output_tree();
+  // myBinaryTree.balance_tree();
+  // myBinaryTree.output_tree();
   std::cout << std::endl;
+}
+int main() {
+  LINKEDLIST::Linked_List<int> mynums;
+  for (int i = 0; i < 10; i++) {
+    std::cout << i << std::endl;
+    mynums.insert(i);
+  }
+  for (int i = mynums.size() - 1; i >= 0; i--) {
+    std::cout << mynums[i] << std::endl;
+  }
   std::cout << "terminating process" << std::endl;
   return 0;
 }

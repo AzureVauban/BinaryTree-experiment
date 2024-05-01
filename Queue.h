@@ -4,12 +4,12 @@
 #include "LinkedList.h"
 #include <cstddef>
 namespace QUEUE {
-template <class T> struct Queue {
+template <class datatype_T> struct Queue {
 private:
-  LINKEDLIST::Linked_List<T> linkedQueue;
+  LINKEDLIST::Linked_List<datatype_T> linkedQueue;
 
 public:
-  void Enqueue(T value) { linkedQueue.insert(value); }
+  void Enqueue(datatype_T value) { linkedQueue.insert(value); }
 
   void Dequeue() {
     if (!IsEmpty()) {
@@ -17,9 +17,9 @@ public:
     }
   }
 
-  T Peek() {
+  datatype_T Peek() {
     if (IsEmpty()) {
-      return T();
+      return datatype_T();
     }
     return linkedQueue.get_node(0)->value;
   }
@@ -35,7 +35,7 @@ public:
 };
 } // namespace QUEUE
 namespace PRIORITY_QUEUE {
-template <class datatype_T> struct PriorityQueue { // UNTESTED
+template <class datatype_K> struct PriorityQueue { // UNTESTED
 private:
   template <class datatype_N> struct PriorityQueueNode {
     size_t priority;
@@ -45,15 +45,15 @@ private:
         : priority(priority), value(value) {}
   };
 
-  LINKEDLIST::Linked_List<PriorityQueueNode<datatype_T>> Heap;
+  LINKEDLIST::Linked_List<PriorityQueueNode<datatype_K>> Heap;
 
-  datatype_T Peek() {
+  datatype_K Peek() {
     if (IsEmpty()) {
-      return datatype_T();
+      return datatype_K();
     }
     return Heap.get_node(0)->value;
   }
-  void heapify(LINKEDLIST::Linked_List<datatype_T> &list, size_t index) {
+  void heapify(LINKEDLIST::Linked_List<datatype_K> &list, size_t index) {
     size_t largest = index, left = (2 * index) + 1, right = (2 * index) + 2;
 
     // Compare node with left child
@@ -81,7 +81,7 @@ public:
 
   size_t Size() { return Heap.size(); }
 
-  void Enqueue(datatype_T value, size_t priority) {
+  void Enqueue(datatype_K value, size_t priority) {
     Heap.insert(value);
     heapify(Heap, 0);
   }

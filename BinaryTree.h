@@ -204,6 +204,8 @@ private: // PRIVATE HELPER FUNCTIONS
                                size_HELPER(root->right) + 1);
   }
 
+  // datatype_A &operator[](size_t index) { return Heap.get_node(index); }
+
 public:
   ~BinaryTree() {
     delete head;
@@ -232,7 +234,18 @@ template <class datatype_B> struct CompleteBinaryTree {
   LINKEDLIST::Linked_List<datatype_B> Heap;
 
 public:
-  CompleteBinaryTree() { Heap = LINKEDLIST::Linked_List<datatype_B>(); }
+  CompleteBinaryTree() : Heap(LINKEDLIST::Linked_List<datatype_B>()) {}
+
+  void insert(size_t index = 0) { std::cout << "NOT IMPLEMENTED" << std::endl; }
+  void remove(size_t index = 0) { std::cout << "NOT IMPLEMENTED" << std::endl; }
+
+  void peak() { std::cout << "NOT IMPLEMENTED" << std::endl; }
+  void getvalueatnode(size_t index) {
+    std::cout << "NOT IMPLEMENTED" << std::endl;
+  }
+
+  datatype_B &operator[](size_t index) { return Heap.get_node(index); }
+
   ~CompleteBinaryTree() {
     // deallocate list
     while (!Heap.isempty()) {
@@ -240,5 +253,6 @@ public:
     }
   }
 };
+;
 } // namespace BINARYTREE
 #endif // BINARYTREE_H
