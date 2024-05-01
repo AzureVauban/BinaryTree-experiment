@@ -12,23 +12,8 @@ int randomBetween(int a, int b)
 
 int main()
 {
-    //@ using namespace BINARYTREE;
-    //@ std::vector<int> nums = {};
-    //@ BinaryTree<int> myBinaryTree;
-    //@ for (int i = 0; i < randomBetween(10, 100); i++)
-    //@ {
-    //@     int chosen_value = randomBetween(0, 100);
-    //@     nums.emplace_back(chosen_value);
-    //@     myBinaryTree.insert(chosen_value);
-    //@     std::cout << chosen_value << " ";
-    //@ }
-    //@ std::cout << std::endl;
-    // std::cout << "SIZE OF BT TREE: " << myBinaryTree.size() << std::endl;
-
     LINKEDLIST::Linked_List<int> myList;
-
-    // std::string msg = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
+    BINARYTREE::BinaryTree<int> myBinaryTree;
     for (int i = 0; i != 40; i++)
     {
         int chosen_value = i;
@@ -63,16 +48,17 @@ int main()
     }
     myList.print_list(true);
 
-    BINARYTREE::BinaryTree<int> myBinaryTree;
-    // create a binary tree
+        // create a binary tree
     for (int current_index = 0; current_index <= (myList.size() / 2); current_index++)
     {
         int left_child = (current_index * 2) + 1;
         int right_child = (current_index * 2) + 2;
-        if (left_child < myList.size()) {
+        if (left_child < myList.size())
+        {
             myBinaryTree.insert(left_child);
-        } 
-        if (right_child < myList.size()) {
+        }
+        if (right_child < myList.size())
+        {
             myBinaryTree.insert(right_child);
         }
     }
