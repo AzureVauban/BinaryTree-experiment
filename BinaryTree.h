@@ -77,8 +77,8 @@ public:
       current->right = nullptr;
     }
     // reheapify nodes
-    for (int index = (size() / 2) - 1; index >= 0; index--) {
-        this->heapify(list, index);
+    for (int index = 0; index < (size() / 2) - 1; index--) {
+      this->heapify(list, index);
     }
     // OUTPUT LIST
     std::cout << "TEST REHEAP: ";
@@ -87,11 +87,18 @@ public:
     }
     std::cout << std::endl;
     // relink nodes
-    for (int index = 0; index <= (list.size() / 2) - 1; index++) {
-      int left_child = (2 * index) + 1;
-      int right_child = (2 * index) + 2;
+    for (int index = 0; index < (size() / 2)-1; index++) {
+      {
+        int left_child = (2 * index) + 1;
+        int right_child = (2 * index) + 2;
+        BinaryTreeNode<datatype_A> *&current = list.get_node(index)->value;
+
+        current->left = list.get_node(left_child)->value;
+        current->right = list.get_node(right_child)->value;
+        //std::cout << "BREAKPOINT2\n";
+      }
     }
-    std::cout << "BREAKPOINT\n";
+      std::cout << "BREAKPOINT\n";
   }
 
 private: // PRIVATE HELPER FUNCTIONS
@@ -197,25 +204,30 @@ private: // PRIVATE HELPER FUNCTIONS
     return static_cast<size_t>(size_HELPER(root->left) +
                                size_HELPER(root->right) + 1);
   }
-  void heapify(LINKEDLIST::Linked_List<BinaryTreeNode<datatype_A> *> list,
+  void heapify(LINKEDLIST::Linked_List<BinaryTreeNode<datatype_A> *> &list,
                size_t index) {
-    int greatest = index, left = (2 * index) + 1, right = (2 * index) + 2;
+    size_t largest = index;
+    size_t left = (2 * index) + 1;
+    size_t right = (2 * index) + 2;
 
-    // compare larger to children indicies
-    if (left < list.size() &&
-        list.get_node(left)->value->data > list.get_node(right)->value->data) {
-      greatest = left;
-    }
-    if (right < list.size() &&
-        list.get_node(right)->value->data > list.get_node(left)->value->data) {
-      greatest = right;
+    // Compare node with left child
+    if (left < list.size() && list.get_node(left)->value->data >
+                                  list.get_node(largest)->value->data) {
+      largest = left;
     }
 
-    // if largest is not root
-    if (greatest != index) {
-      list.swap(index, greatest);
+    // Compare largest so far with right child
+    if (right < list.size() && list.get_node(right)->value->data >
+                                   list.get_node(largest)->value->data) {
+      largest = right;
     }
-    heapify(list, index);
+
+    // If largest is not the current node, swap and continue heapifying
+    if (largest != index) {
+      list.swap(index, largest);
+      heapify(list,
+              largest); // Call heapify on the child index that was swapped
+    }
   }
 
 public:
