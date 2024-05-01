@@ -177,6 +177,7 @@ public:
   ~Linked_List() { delete this->head; }
 };
 
+
 } // namespace LINKEDLIST
 
 #endif // LINKED_LIST_H

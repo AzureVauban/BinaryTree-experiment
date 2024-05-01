@@ -45,57 +45,59 @@ public:
   void insert(datatype_A value) { insert_HELPER(head, value); }
   void remove(datatype_A value) { remove_HELPER(head, value); }
 
-private:
-  void enqueue_all_nodes(
-      BinaryTreeNode<datatype_A> *&root,
-      LINKEDLIST::Linked_List<BinaryTreeNode<datatype_A> *> &list) {
-
-    if (root) {
-      list.insert(root);
-    }
-    if (root->left) {
-      enqueue_all_nodes(root->left, list);
-    }
-    if (root->right) {
-      enqueue_all_nodes(root->right, list);
-    }
-  }
+  //  private:
+  //    void enqueue_all_nodes(
+  //        BinaryTreeNode<datatype_A> *&root,
+  //        LINKEDLIST::Linked_List<BinaryTreeNode<datatype_A> *> &list) {
+  //
+  //      if (root) {
+  //        list.insert(root);
+  //      }
+  //      if (root->left) {
+  //        enqueue_all_nodes(root->left, list);
+  //      }
+  //      if (root->right) {
+  //        enqueue_all_nodes(root->right, list);
+  //      }
+  //    }
 
 public:
   // MISC FUNCTIONS
   void output_tree() { output_tree_HELPER(head); }
 
-  void balance_tree() {
-    LINKEDLIST::Linked_List<BinaryTreeNode<datatype_A> *> list;
-    enqueue_all_nodes(head, list);
-
-    // Reheapify nodes
-    for (int index = (list.size() / 2) - 1; index >= 0; index--) {
-      heapify(list, index);
-    }
-    // Output the list (for testing)
-    std::cout << "TEST REHEAP: ";
-    for (int index = 0; index < list.size(); index++) {
-      std::cout << list.get_node(index)->value->data << " ";
-    }
-    std::cout << std::endl;
-    // Relink nodes
-    for (int index = 0; index < list.size() / 2; index++) {
-      int left_child = (2 * index) + 1;
-      int right_child = (2 * index) + 2;
-      bool isrightvalid = right_child >= 0 && right_child < list.size();
-      BinaryTreeNode<datatype_A> *current = list.get_node(index)->value;
-
-      // if (left_child < list.size()) {
-      current->left = list.get_node(left_child)->value;
-
-      //}
-      if (!right_child >= list.size() && isrightvalid) {
-        current->right = list.get_node(right_child)->value;
-      }
-    }
-    std::cout << std::endl;
-  }
+  //  void balance_tree() {
+  //    LINKEDLIST::Linked_List<BinaryTreeNode<datatype_A> *> list;
+  //    enqueue_all_nodes(head, list);
+  //
+  //    // Reheapify nodes
+  //    for (int index = (list.size() / 2) - 1; index >= 0; index--) {
+  //      LINKEDLIST::heapify(list, index);
+  //    }
+  //    // Output the list (for testing)
+  //    std::cout << "TEST REHEAP: ";
+  //    for (int index = 0; index < list.size(); index++) {
+  //      std::cout << list.get_node(index)->value->data << " ";
+  //    }
+  //    std::cout << std::endl;
+  //    // Relink nodes
+  //    this->head = list.get_node(0)->value;
+  //    list.remove(0);
+  //    for (int index = 0; index < list.size() / 2; index++) {
+  //      int left_child = (2 * index) + 1;
+  //      int right_child = (2 * index) + 2;
+  //      bool isrightvalid = right_child >= 0 && right_child < list.size();
+  //      BinaryTreeNode<datatype_A> *current = list.get_node(index)->value;
+  //
+  //      // if (left_child < list.size()) {
+  //      current->left = list.get_node(left_child)->value;
+  //
+  //      //}
+  //      if (isrightvalid && right_child < list.size()) {
+  //        current->right = list.get_node(right_child)->value;
+  //      }
+  //    }
+  //    std::cout << "TREE HAS BEEN REBALANCED" << std::endl;
+  //  }
 
 private: // PRIVATE HELPER FUNCTIONS
   void remove_HELPER(BinaryTreeNode<datatype_A> *&root, datatype_A value) {
@@ -201,34 +203,41 @@ private: // PRIVATE HELPER FUNCTIONS
     return static_cast<size_t>(size_HELPER(root->left) +
                                size_HELPER(root->right) + 1);
   }
-  void heapify(LINKEDLIST::Linked_List<BinaryTreeNode<datatype_A> *> &list,
-               size_t index) {
-    size_t largest = index, left = (2 * index) + 1, right = (2 * index) + 2;
-
-    // Compare node with left child
-    if (left < list.size() && list.get_node(left)->value->data >
-                                  list.get_node(largest)->value->data) {
-      largest = left;
-    }
-
-    // Compare largest so far with right child
-    if (right < list.size() && list.get_node(right)->value->data >
-                                   list.get_node(largest)->value->data) {
-      largest = right;
-    }
-
-    // If largest is not the current node, swap and continue heapifying
-    if (largest != index) {
-      list.swap(index, largest);
-      heapify(list,
-              largest); // Call heapify on the child index that was swapped
-    }
-  }
 
 public:
   ~BinaryTree() {
     delete head;
     head = nullptr;
+  }
+};
+
+template <class datatype_B> struct CompleteBinaryTree {
+  template <class datatype_C> struct BinaryTreeNode {
+  private:
+    BinaryTreeNode<datatype_C> *right = nullptr, *left = nullptr;
+    datatype_B data;
+    BinaryTreeNode(datatype_C value)
+        : left(nullptr), right(nullptr), data(value) {}
+    ~BinaryTreeNode() {
+      if (right) {
+        delete right;
+        right = nullptr;
+      }
+      if (left) {
+        delete left;
+        left = nullptr;
+      }
+    }
+  };
+  LINKEDLIST::Linked_List<datatype_B> Heap;
+
+public:
+  CompleteBinaryTree() { Heap = LINKEDLIST::Linked_List<datatype_B>(); }
+  ~CompleteBinaryTree() {
+    // deallocate list
+    while (!Heap.isempty()) {
+      Heap.remove(0);
+    }
   }
 };
 } // namespace BINARYTREE
