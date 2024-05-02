@@ -120,6 +120,9 @@ public:
   }
   // MUTATOR MEMBER FUNCTIONS
 
+  void reverse() {
+    // reverses the current list, DOES not return reversed list
+  }
   void insert(Data value, size_t index) {
     if (isempty() && index == 0) {
       head = new Array(value, 0);
