@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <iostream>
+#include <regex>
 
 namespace LINKEDLIST {
 
@@ -88,6 +89,19 @@ public:
 
   bool isempty() const { return head == 0; }
 
+  bool in(const Data value) const {
+    if (isempty()) {
+      return false;
+    }
+    Array *current = head;
+    while (current) {
+      if (current->value == value) {
+        return true;
+      }
+      current = current->next;
+    }
+    return false;
+  }
   // MISC HELPER FUNCTIONS
 
   void print_index(const size_t index, const bool includeWS) {
@@ -120,9 +134,6 @@ public:
   }
   // MUTATOR MEMBER FUNCTIONS
 
-  void reverse() {
-    // reverses the current list, DOES not return reversed list
-  }
   void insert(Data value, size_t index) {
     if (isempty() && index == 0) {
       head = new Array(value, 0);
@@ -195,25 +206,23 @@ public:
   }
   Data &operator[](size_t index) { return this->get_node(index)->value; }
 
-  Array operator=(const Array &Source) {
-
+  Array operator=(Array &Source) {
+    if (Source == this) {
+      return *this;
+    }
     for (int i = 0; i < Source.size(); i++) {
       insert(Source[i], i);
     }
     // resize
-    while (size() != Source.size()) {
-      remove(size() - 1);
-    }
+    //    while (size() != Source.size()) {
+    //      remove(size() - 1);
+    //    }
     return *this;
   }
   Array operator+(const Array &Source) {
     // concatenate two lists together and return the result
     for (int i = 0; i < Source.size(); i++) {
-      insert(Source[i], i);
-    }
-    // resize
-    while (size() != Source.size()) {
-      remove(size() - 1);
+      insert(Source[i], size() - 1);
     }
     return *this; // NOT IMPLEMENTED
   }
@@ -263,20 +272,23 @@ public:
     left_node->value = right_node->value;
     right_node->value = temp_value;
   }
-
-  bool in(const Data value) const {
-    if (isempty()) {
-      return false;
+  void clear() {
+    while (!isempty()) {
+      remove();
     }
-    Array *current = head;
-    while (current) {
-      if (current->value == value) {
-        return true;
-      }
-      current = current->next;
-    }
-    return false;
   }
+
+  void reverse() {
+    // reverses the current list, DOES not return reversed list
+    if (size() > 1) {
+      for (size_t index = 0; index < size(); index++) {
+        for (size_t index2 = 0; index2 < size(); index2++) {
+          swap(index2, index2);
+        }
+      }
+    }
+  }
+
   ~Linked_List() {
     Array *current = head;
     while (current != nullptr) {

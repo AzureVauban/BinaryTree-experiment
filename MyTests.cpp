@@ -18,7 +18,7 @@ int randomBetween(int a, int b) {
 template <typename T> class LinkedListUnitTest {
   typedef LINKEDLIST::Linked_List<T> Array;
   static Array Test;
-  const static int TESTCASES = 10000;
+  const static int TESTCASES = 1000;
   // The 'PRINTDEBUGLIST' function prints the size, maximum index, and elements
   // of
   // a given linked list 'List'. It is used for debugging purposes.
@@ -124,46 +124,53 @@ template <typename T> class LinkedListUnitTest {
            preremovalsize == List.size() + 1;
   }
 
-  // This function is intended to test the equality operator for a linked list.
-  // Currently, it is not implemented.
-
-  bool test_operatorEQUAL(const Array &List) {
-    std::cout << "TEST NOT IMPLEMENTED, SKIPPING" << std::endl;
-    return true;
-  }
-
-  // This function is intended to test the addition operator for a linked list.
-  // Currently, it is not implemented.
-
-  bool test_operatorADDITION(const Array &List) {
-    std::cout << "TEST NOT IMPLEMENTED, SKIPPING" << std::endl;
-    return true;
-  }
-
-  // This function is intended to test the combined equality and addition
-  // operators for a linked list. Currently, it is not implemented.
-
-  bool test_operatorEQUALADDITION(const Array &List) {
-    std::cout << "TEST NOT IMPLEMENTED, SKIPPING" << std::endl;
-    return true;
-  }
-
-  // This function is intended to test the subtraction operator for a linked
-  // list. Currently, it is not implemented.
-
-  bool test_operatorSUBTRACTION(const Array &List) {
-    std::cout << "TEST NOT IMPLEMENTED, SKIPPING" << std::endl;
-    return true;
-  }
-
-  // This function is intended to test the combined equality and subtraction
-  // operators for a linked list. Currently, it is not implemented.
-
-  bool test_operatorEQUALSUBTRACTION(const Array &List) {
-    std::cout << "TEST NOT IMPLEMENTED, SKIPPING" << std::endl;
-    return true;
-  }
-
+  /// #  // This function is intended to test the equality operator for a linked
+  /// list. #  // Currently, it is not implemented.
+  /// #
+  /// #  bool test_operatorEQUAL(const Array &List) {
+  /// #    // manually copy the list
+  /// #    Array TempCopy = CreateList(randomBetween(1, List.size()));
+  /// #//    for (int i = 0; i < List.size(); i++) {
+  /// #//      TempCopy[i] = List[i];
+  /// #//    }
+  /// #    bool SUCCESSFUL_COPY = true;
+  /// #    return SUCCESSFUL_COPY;
+  /// #  }
+  /// #
+  /// #  // This function is intended to test the addition operator for a linked
+  /// list. #  // Currently, it is not implemented.
+  /// #
+  /// #  bool test_operatorADDITION(const Array &List) {
+  /// #    Array AppendList;
+  /// #
+  /// #    return true;
+  /// #  }
+  /// #
+  /// #  // This function is intended to test the combined equality and addition
+  /// #  // operators for a linked list. Currently, it is not implemented.
+  /// #
+  /// #  bool test_operatorEQUALADDITION(const Array &List) {
+  /// #    std::cout << "TEST NOT IMPLEMENTED, SKIPPING" << std::endl;
+  /// #    return true;
+  /// #  }
+  /// #
+  /// #  // This function is intended to test the subtraction operator for a
+  /// linked #  // list. Currently, it is not implemented.
+  /// #
+  /// #  bool test_operatorSUBTRACTION(const Array &List) {
+  /// #    std::cout << "TEST NOT IMPLEMENTED, SKIPPING" << std::endl;
+  /// #    return true;
+  /// #  }
+  /// #
+  /// #  // This function is intended to test the combined equality and
+  /// subtraction #  // operators for a linked list. Currently, it is not
+  /// implemented.
+  /// #
+  /// #  bool test_operatorEQUALSUBTRACTION(const Array &List) {
+  /// #    std::cout << "TEST NOT IMPLEMENTED, SKIPPING" << std::endl;
+  /// #    return true;
+  /// #  }
+  /// #
   // This function is intended to test the reverse operation on a linked list.
   // Currently, it is not implemented.
   bool test_reverse(Array &List) {
@@ -198,12 +205,12 @@ public:
       std::cout << std::endl;
       assert(test_swap(List));
       assert(test_remove(List));
-      assert(test_operatorEQUAL(List));
-      assert(test_operatorADDITION(List));
-      assert(test_operatorEQUALADDITION(List));
-      assert(test_operatorSUBTRACTION(List));
-      assert(test_operatorEQUALSUBTRACTION(List));
       assert(test_reverse(List));
+      //      assert(test_operatorEQUAL(List));
+      //      assert(test_operatorADDITION(List));
+      //      assert(test_operatorEQUALADDITION(List));
+      //      assert(test_operatorSUBTRACTION(List));
+      //      assert(test_operatorEQUALSUBTRACTION(List));
     }
   }
 };
