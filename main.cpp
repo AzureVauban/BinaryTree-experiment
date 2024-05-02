@@ -19,11 +19,18 @@ void binarytree_test() {
     // std::cout << i << std::endl;
   }
   // std::cout << "SIZE: " << myBinaryTree.size() << std::endl;
-  myBinaryTree.output_tree();
+///$  myBinaryTree.output_tree();
   std::cout << std::endl;
-  // myBinaryTree.balance_tree();
-  // myBinaryTree.output_tree();
-  std::cout << std::endl;
+
+  int test_size = randomBetween(10, 40);
+  for (int i = 0; i < test_size; i++) {
+    myBinaryTree.insert(randomBetween(0, 100));
+  }
+  while(myBinaryTree.isempty()) {
+///$    myBinaryTree.output_tree();
+///$    std::cout << std::endl;
+    myBinaryTree.remove();
+  }
 }
 int main() {
   // LINKEDLIST::Linked_List<int> mynums;
@@ -35,21 +42,16 @@ int main() {
   //   std::cout << mynums[i] << std::endl;
   // }
 
-  BINARYTREE::CompleteBinaryTree<int> myBinaryTree;
-  myBinaryTree.insert(12, 2);
-  myBinaryTree.insert(5, 1);
-  myBinaryTree.insert(1, 4);
-  myBinaryTree.insert(37, 5);
-  myBinaryTree.insert(64, 3);
-  myBinaryTree.insert(90, 6);
-  myBinaryTree.insert(97, 8);
-  myBinaryTree.insert(91, 7);
+  BINARYTREE::BinaryTree<int> BTree;
 
-  for (int i = 0; i < myBinaryTree.size(); i++) {
-    std::cout << myBinaryTree[i] << " ";
-  }
-  // expected order: 97, 37, 91, 12, 5, 90, 64, 1
-  std::cout << std::endl;
+  binarytree_test();
+    std::cout << std::endl;
+  // #  BINARYTREE::CompleteBinaryTree<int> CompleteBTree(BTree);
+  // #  // expected order: 97, 37, 91, 12, 5, 90, 64, 1
+  // #  for (int i = 0; i < CompleteBTree.size(); i++) {
+  // #    std::cout << CompleteBTree[i] << " ";
+  // #  }
+  // #  std::cout << std::endl;
   std::cout << "terminating process" << std::endl;
   return 0;
 }
