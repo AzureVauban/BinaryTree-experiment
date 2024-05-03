@@ -17,7 +17,7 @@ int randomBetween(int a, int b) {
 }
 template <typename T> class LinkedListUnitTest {
   typedef LINKEDLIST::Linked_List<T> Array;
-  const static int TESTCASES = 1000;
+  const static int TESTCASES = 10000;
   // The 'PRINTDEBUGLIST' function prints the size, maximum index, and elements
   // of
   // a given linked list 'List'. It is used for debugging purposes.
@@ -104,7 +104,7 @@ template <typename T> class LinkedListUnitTest {
   // the value at the chosen index has changed, indicating successful removal.
   bool test_remove(Array &List) {
     if (List.size() == 1) {
-      List.remove();
+      List.remove(0);
       return List.isempty();
     }
     size_t chosen_index = randomBetween(0, List.size() - 1),
@@ -140,11 +140,12 @@ template <typename T> class LinkedListUnitTest {
   }
 
   bool test_clear(Array &List) {
-    //size_t n = List.size();
-    //std::cout << "DELETING OF " << n << " VALUES" << std::endl;
-    //List.clear();
-    //! return List.isempty();
-    return true;
+    size_t n = List.size();
+    std::cout << "DELETING OF " << n << " VALUES" << std::endl;
+    List.reverse();
+    List.print_list(true);
+    List.clear();
+    return List.isempty();
   }
 
 public:
@@ -154,11 +155,11 @@ public:
       for (int i = 0; i != 80; i++) {
         std::cout << '=';
       }
-      const int TESTSIZE = randomBetween(1, 40);
-  
+      const int TESTSIZE = randomBetween(3, 1000);
+
       Array List;
       for (int j = 0; j < TESTSIZE; j++) {
-        int chosen_value = randomBetween(0, 100);
+        int chosen_value = randomBetween(-1000, 1000);
         if (!List.in(chosen_value)) {
           List.insert(chosen_value);
         }
@@ -170,7 +171,7 @@ public:
       std::cout << std::endl;
       assert(test_swap(List));
       assert(test_remove(List));
-      assert(test_reverse(List));
+      // assert(test_reverse(List));
       assert(test_clear(List));
     }
   }

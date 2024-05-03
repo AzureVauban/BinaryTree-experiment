@@ -29,20 +29,20 @@ public:
 
 private:
   // PRIVATE HELPER FUNCTIONS
-  //! void reindex() {
-  //!   Node *current = head;
-  //!   size_t index = 0;
-  //!   while (current) {
-  //!     current->index = index;
-  //!     current = current->next;
-  //!     index += 1;
-  //!   }
-  //! }
-  //!  index is only valid if index >= 0 && index < size()
-  //!   bool isindexvalid(size_t index) const {
-  //!     //const size_t n = size();
-  //!     return index >= 0 && index < current_size;
-  //!   }
+  void reindex() {
+    Node *current = head;
+    size_t index = 0;
+    while (current) {
+      current->index = index;
+      current = current->next;
+      index += 1;
+    }
+  }
+  // index is only valid if index >= 0 && index < size()
+  bool isindexvalid(size_t index) const {
+    // const size_t n = size();
+    return index >= 0 && index < current_size;
+  }
 
   bool isinvalidindex(const size_t index) const {
     return index < 0 && index >= current_size;
@@ -158,14 +158,29 @@ public:
     if (isempty()) {
       return;
     }
-    if (isinvalidindex(index)) {
+    if (isinvalidindex(index) && index != 0) {
       return;
     }
 
     size_t n = size();
 
-    // if no child
-    if (index == n - 1) {
+    if (index == 0 && current_size == 1) {
+      delete head;
+      head = nullptr;
+      current_size = 0;
+    } else if (index == 0) { // if no parent (index = 0)
+      Node *old_head = head, *new_head = nullptr;
+      if (old_head->next) {
+        new_head = old_head->next;
+        old_head->next = nullptr;
+      }
+      head = new_head;
+      current_size -= 1;
+      delete old_head;
+      reindex();
+      return;
+    } // if no child
+    else if (index == n - 1) {
       // traverse to the second last Node
       Node *current = head, *current_prev = nullptr;
       while (current->next) {
@@ -177,28 +192,18 @@ public:
       }
       current_size -= 1;
       delete current;
-      //! reindex();
+      reindex();
       return;
     }
 
-    else if (index == 0) { // if no parent (index = 0)
-      Node *old_head = head, *new_head = nullptr;
-      if (old_head->next) {
-        new_head = old_head->next;
-        old_head->next = nullptr;
-      }
-      head = new_head;
-      current_size -= 1;
-      delete old_head;
-      //!      reindex();
-    } else {
+    else {
       // if parent and child at index
       for (int current = index; current < n - 1; current++) {
         Node *NodeA = get_node(current), *NodeB = get_node(current + 1);
         NodeA->value = NodeB->value;
       }
       remove(size() - 1);
-      //!      reindex();
+      reindex();
     }
   }
 
@@ -213,9 +218,10 @@ public:
   }
 
   void clear() {
-    for (int i = 0; i < current_size; i++) {
+    const size_t sizecopy = size();
+    for (int i = 0; i < sizecopy; i++) {
       remove();
-      }
+    }
   }
 
   // OVERLOAD OPERATORS
@@ -232,9 +238,7 @@ public:
     return *this; // Return the current list
   }
 
-  ~Linked_List() {
-    clear();
-  }
+  ~Linked_List() { clear(); }
 };
 
 template <class Data> Linked_List<Data> Copy(Linked_List<Data> &Source) {
