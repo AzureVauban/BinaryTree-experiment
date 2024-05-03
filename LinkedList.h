@@ -29,22 +29,24 @@ public:
 
 private:
   // PRIVATE HELPER FUNCTIONS
-  void reindex() {
-    Node *current = head;
-    size_t index = 0;
-    while (current) {
-      current->index = index;
-      current = current->next;
-      index += 1;
-    }
-  }
-  // index is only valid if index >= 0 && index < size()
-  bool isindexvalid(size_t index) const {
-    //const size_t n = size();
-    return index >= 0 && index < current_size;
-  }
+  //! void reindex() {
+  //!   Node *current = head;
+  //!   size_t index = 0;
+  //!   while (current) {
+  //!     current->index = index;
+  //!     current = current->next;
+  //!     index += 1;
+  //!   }
+  //! }
+  //!  index is only valid if index >= 0 && index < size()
+  //!   bool isindexvalid(size_t index) const {
+  //!     //const size_t n = size();
+  //!     return index >= 0 && index < current_size;
+  //!   }
 
-  bool isinvalidindex(const size_t index) const { return index < 0 && index >= current_size; }
+  bool isinvalidindex(const size_t index) const {
+    return index < 0 && index >= current_size;
+  }
   Node *get_endpoint() {
     if (isempty()) {
       return head;
@@ -60,7 +62,7 @@ public:
   // CONST MEMBER FUNCTIONS
 
   Node *get_node(size_t index) {
-    if (!isindexvalid(index)) {
+    if (isinvalidindex(index)) {
       return nullptr;
     }
     if (index == size() - 1) {
@@ -77,7 +79,7 @@ public:
     }
   }
   size_t size() const { return static_cast<size_t>(current_size); }
-  bool isempty() const { return head == 0; }
+  bool isempty() const { return current_size == 0; }
 
   bool in(const Data value) const {
     if (isempty()) {
@@ -123,7 +125,7 @@ public:
       head = new Node(value, 0);
       current_size += 1;
     }
-    if (!isindexvalid(index)) {
+    if (isinvalidindex(index)) {
       return;
     }
     // add dummy value to end
@@ -153,24 +155,17 @@ public:
 
   void remove(size_t index = 0) {
     // there are 3 cases
-    if (isempty()) { return; }
-    if (!isindexvalid(index)) { return; }
+    if (isempty()) {
+      return;
+    }
+    if (isinvalidindex(index)) {
+      return;
+    }
 
     size_t n = size();
-    // if no parent (index = 0)
-    if (index == 0) {
-      Node *old_head = head, *new_head = nullptr;
-      if (old_head->next) {
-        new_head = old_head->next;
-        old_head->next = nullptr;
-      }
-      head = new_head;
-      current_size -= 1;
-      delete old_head;
-      reindex();
-    }
+
     // if no child
-    else if (index == n - 1) {
+    if (index == n - 1) {
       // traverse to the second last Node
       Node *current = head, *current_prev = nullptr;
       while (current->next) {
@@ -182,8 +177,20 @@ public:
       }
       current_size -= 1;
       delete current;
-      reindex();
+      //! reindex();
       return;
+    }
+
+    else if (index == 0) { // if no parent (index = 0)
+      Node *old_head = head, *new_head = nullptr;
+      if (old_head->next) {
+        new_head = old_head->next;
+        old_head->next = nullptr;
+      }
+      head = new_head;
+      current_size -= 1;
+      delete old_head;
+      //!      reindex();
     } else {
       // if parent and child at index
       for (int current = index; current < n - 1; current++) {
@@ -191,12 +198,12 @@ public:
         NodeA->value = NodeB->value;
       }
       remove(size() - 1);
-      reindex();
+      //!      reindex();
     }
   }
 
   void swap(size_t left_index, size_t right_index) {
-    if (!isindexvalid(left_index) || !isindexvalid(right_index)) {
+    if (isinvalidindex(left_index) || isinvalidindex(right_index)) {
       return;
     }
     Node *left_node = get_node(left_index), *right_node = get_node(right_index);
@@ -206,11 +213,9 @@ public:
   }
 
   void clear() {
-    while (size() != 1) {
-      remove(current_size);
-    }
-    delete head;
-    head = nullptr;
+    for (int i = 0; i < current_size; i++) {
+      remove();
+      }
   }
 
   // OVERLOAD OPERATORS
@@ -228,11 +233,7 @@ public:
   }
 
   ~Linked_List() {
-    while (head) {
-      Node *current = head;
-      head = head->next;
-      delete current;
-    }
+    clear();
   }
 };
 
