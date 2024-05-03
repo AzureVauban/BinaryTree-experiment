@@ -41,7 +41,7 @@ public:
 
   size_t size() { return size_HELPER(head); }
 
-  bool isempty()  { return size() == 0; }
+  bool isempty() { return size() == 0; }
 
   bool iscomplete() const { return iscomplete(head); }
 

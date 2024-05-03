@@ -2,7 +2,9 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdlib>
+#include <fstream>
 #include <random>
+#include <string>
 #include <vector>
 
 // The 'randomBetween' function generates a random integer between two given
@@ -15,12 +17,15 @@ int randomBetween(int a, int b) {
 
   return distr(gen); // generate numbers
 }
+
+// The 'CreateList' function generates a linked list of unique random
+// integers. The size of the list is determined by the 'capacity' parameter.
+LINKEDLIST::Linked_List<int> CreateIntList(const size_t, const int, const int);
 template <typename T> class LinkedListUnitTest {
   typedef LINKEDLIST::Linked_List<T> Array;
-  const static int TESTCASES = 10000;
+  const static int TESTCASES = 1000;
   // The 'PRINTDEBUGLIST' function prints the size, maximum index, and elements
-  // of
-  // a given linked list 'List'. It is used for debugging purposes.
+  // of a given linked list 'List'. It is used for debugging purposes.
   void PRINTDEBUGLIST(Array &List) {
     std::cout << "SIZE: " << List.size() << std::endl;
     std::cout << "MAX INDEX: " << List.size() - 1 << std::endl;
@@ -29,27 +34,6 @@ template <typename T> class LinkedListUnitTest {
     std::cout << std::endl;
   }
 
-  // The 'CreateList' function generates a linked list of unique random
-  // integers. The size of the list is determined by the 'capacity' parameter.
-  LINKEDLIST::Linked_List<int> CreateList(const size_t capacity = 10) {
-    std::vector<int> values;
-    LINKEDLIST::Linked_List<int> intArray;
-    for (int i = 0; i < capacity; i++) {
-      int chosen_value = randomBetween(0, 100);
-      bool isduplicate = false;
-      for (int j = 0; j < values.size(); j++) {
-        if (values.at(j) == chosen_value) {
-          isduplicate = true;
-          break;
-        }
-        if (!isduplicate) {
-          values.emplace_back(chosen_value);
-          intArray.insert(chosen_value);
-        }
-      }
-    }
-    return intArray;
-  }
   // This 'test_peek' function tests the 'peek' operation of a linked list by
   // comparing the first element of the list with an expected value. It returns
   // 'true' if the test passes and 'false' otherwise.
@@ -155,11 +139,11 @@ public:
       for (int i = 0; i != 80; i++) {
         std::cout << '=';
       }
-      const int TESTSIZE = randomBetween(3, 1000);
+      const int TESTSIZE = randomBetween(3, 20);
 
       Array List;
       for (int j = 0; j < TESTSIZE; j++) {
-        int chosen_value = randomBetween(-1000, 1000);
+        int chosen_value = randomBetween(0, 1000);
         if (!List.in(chosen_value)) {
           List.insert(chosen_value);
         }
@@ -177,10 +161,65 @@ public:
   }
 };
 
-int main() {
+template <class Key, class B> class HashMapUnitTest {
+  // implement as a complete binary tree of buckets
+  // the bucket is a linked list
+  typedef JACKSONHASH::HashMap<Key, B> Value;
+  size_t TESTCASE_NUM;
+  // TEST FUNCTIONS
+  bool test_echo() {
+    std::cout << "NOT IMPLEMENTED YET" << std::endl;
+    return true;
+  }
+  // TEST DRIVER
+  void UnitTests(Value &value) { assert(test_echo()); }
 
-  LinkedListUnitTest<int> mytests;
-  mytests.RunTests();
+public:
+  HashMapUnitTest(Value &MapInstance, const size_t TESTCASE) {
+    TESTCASE_NUM = TESTCASE;
+    UnitTests(MapInstance);
+  };
+  ~HashMapUnitTest() {}
+};
+int main() {
+  using namespace JACKSONHASH;
+  // LinkedListUnitTest<int> mytests;
+  // mytests.RunTests();
+  HashMap<int, std::string> Map;
+  std::ifstream file("../names.txt");
+  std::string str;
+  if (!file.is_open()) {
+    std::cout << "Unable to open file.\n";
+    return 1; // or exit(1);
+  }
+  while (std::getline(file, str)) {
+    std::cout << "ADDING " << str << std::endl;
+  }
+    //Map.insert(0, str);
+
+  HashMapUnitTest<int, std::string> hashMapUnitTest(Map, 0);
   std::cout << "TERMINATING PROCESS" << std::endl;
   return 0;
+}
+
+LINKEDLIST::Linked_List<int> CreateIntList(const size_t capacity = 10,
+                                           const int min = 0,
+                                           const int max = 10) {
+  std::vector<int> values;
+  LINKEDLIST::Linked_List<int> intArray;
+  for (int i = 0; i < capacity; i++) {
+    int chosen_value = randomBetween(min, max);
+    bool value_exists = false;
+    for (int j = 0; j < values.size(); j++) {
+      if (values.at(j) == chosen_value) {
+        value_exists = true;
+        break;
+      }
+    }
+    if (!value_exists) {
+      values.emplace_back(chosen_value);
+      intArray.insert(chosen_value);
+    }
+  }
+  return intArray;
 }

@@ -9,7 +9,7 @@ namespace LINKEDLIST {
 
 template <class datatype_K> struct LinkedListNode {
   LinkedListNode<datatype_K> *next;
-  size_t index;
+  std::size_t index;
   datatype_K value;
   LinkedListNode(datatype_K value, size_t index)
       : next(nullptr), index(index), value(value) {}
@@ -60,6 +60,8 @@ private:
 
 public:
   // CONST MEMBER FUNCTIONS
+
+  const Data &at(Node *node) const { return const_cast<Data>(node->value); }
 
   Node *get_node(size_t index) {
     if (isinvalidindex(index)) {
@@ -226,14 +228,14 @@ public:
 
   // OVERLOAD OPERATORS
 
-  Data &operator[](size_t index) { return this->get_node(index)->value; }
+  Data &operator[](size_t index) { return get_node(index)->value; }
 
   template <class Data>
   LINKEDLIST::Linked_List<Data> &
-  operator=(LINKEDLIST::Linked_List<Data> &Source2) {
-    clear(); // Clear the current list
-    for (int i = 0; i < Source2.size(); i++) {
-      insert(Source2[i]); // Insert elements from Source2 into the current list
+  operator=(const LINKEDLIST::Linked_List<Data> &Source) {
+    clear(); // Clear the list instance
+    for (int i = 0; i < Source.size(); i++) {
+      insert(Source[i]); // Insert elements from Source2 into the current list
     }
     return *this; // Return the current list
   }
@@ -249,7 +251,45 @@ template <class Data> Linked_List<Data> Copy(Linked_List<Data> &Source) {
   }
   return Copied;
 }
+template <class Data>
+Linked_List<Data> operator+(Linked_List<Data> &Left, Linked_List<Data> &Right) {
+  Linked_List<Data> Array;
+  for (size_t index = 0; index < Left.size(); index++) {
+    Array.insert(Left[index]);
+  }
+  for (size_t index = 0; index < Right.size(); index++) {
+    Array.insert(Right[index]);
+  }
+  return Array;
+}
 
 } // namespace LINKEDLIST
 
+namespace JACKSONHASH {
+
+// complete binary tree of Buckets, each Bucket is a Linked List corresponding
+// to a key
+template <class DataType_A, class DataType_B> struct HashMap {
+  typedef DataType_A Key;
+  typedef DataType_B Value;
+  typedef std::pair<Key, Value> Data;
+  typedef LINKEDLIST::Linked_List<Data> HashBucket; // Complete Binary Tree
+  typedef LINKEDLIST::Linked_List<HashBucket> Map;
+  // DECLARATION: NAMESPACE::Hashmap<KEY_DATATYPE,VALUE_DATATYPE>VARNAME;
+  // STD::HashMap<studentID,studentname>StudentsDatabase;
+  void insert(const Key key, const Value value);
+  void remove(const Key key);
+  size_t size() const { return 0; }
+  bool exists(const Key key) const { return false; }
+
+private:
+  float load_factor;
+  size_t Hash(Key key) const { return 0; }
+  Map Table;
+
+public:
+  explicit HashMap<Key, Value>() : Table(Map()), load_factor(0) {}
+  ~HashMap() { Table.clear(); }
+};
+} // namespace JACKSONHASH
 #endif // LINKED_LIST_H
