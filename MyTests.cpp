@@ -161,19 +161,38 @@ template <class Key, class B> class HashMapUnitTest {
   // implement as a complete binary tree of buckets
   // the bucket is a linked list
   typedef HASHMAP::HashMap<Key, B> Value;
+  typedef LINKEDLIST::Linked_List<Key> TestKeys;
   size_t TESTCASE_NUM;
   // TEST FUNCTIONS
   bool test_echo() {
     std::cout << "NOT IMPLEMENTED YET" << std::endl;
     return true;
   }
+  bool test_isempty(Value Map) { return Map.empty(); }
+
+  bool Test_keyexists(const Value &Map, Key &key) {
+    // USE TEST KEY
+    std::cout << "TESTING KEY: " << key << std::endl;
+    // const bool keyispresent = Map.key_exists(key);
+    return true;
+  }
   // TEST DRIVER
-  void UnitTests(Value &value) { assert(test_echo()); }
+  void UnitTests(Value &value, TestKeys &Keys, size_t TESTCASE) {
+    std::cout << "TESTCASE: " << TESTCASE << std::endl;
+    for (int i = 0; i != 80; i++) {
+      std::cout << '=';
+    }
+    std::cout << std::endl;
+    assert(test_isempty(value));
+    for (size_t index = 0; index < Keys.size(); index++) {
+      assert(Test_keyexists(value, Keys[index])); //todo finish this test
+    }
+  }
 
 public:
-  HashMapUnitTest(Value &MapInstance, const size_t TESTCASE) {
+  HashMapUnitTest(Value &Map, TestKeys &Keys, const size_t TESTCASE) {
     TESTCASE_NUM = TESTCASE;
-    UnitTests(MapInstance);
+    UnitTests(Map, Keys, TESTCASE);
   };
   ~HashMapUnitTest() {}
 };
@@ -182,12 +201,15 @@ int main() {
   using namespace HASHMAP;
 
   for (size_t i = 0; i < TESTCASES; i++) {
+    break;
     LINKEDLIST::Linked_List<std::string> Fruits = GenerateRandomStringList(10);
     LinkedListUnitTest<std::string> mystringstests(Fruits, i);
   }
+  LINKEDLIST::Linked_List<std::string> randomkeys =
+      GenerateRandomStringList(10);
   for (size_t i = 0; i < TESTCASES; i++) {
-    HashMap<int, std::string> Map;
-    HashMapUnitTest<int, std::string> hashMapUnitTest(Map, i);
+    HashMap<std::string, std::string> Map;
+    HashMapUnitTest<std::string, std::string> hashMapUnitTest(Map, randomkeys, i);
   }
   std::cout << "TERMINATING PROCESS" << std::endl;
   return 0;

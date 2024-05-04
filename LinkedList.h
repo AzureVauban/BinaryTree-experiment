@@ -3,7 +3,9 @@
 
 #include <cstddef>
 #include <cstdio>
+#include <functional>
 #include <iostream>
+#include <iterator>
 #include <utility>
 
 namespace LINKEDLIST {
@@ -312,9 +314,12 @@ private:
   template <class Key, class Value> struct Pair {
     Key key;
     Value *Bucket;
+
   public:
-    explicit Pair<Key, Value>(Key key = Key(), Value *v = nullptr)
+    explicit Pair<Key, Value>(Key &key, Value *v = nullptr)
         : key(key), Bucket(v) {}
+    bool empty() const { return Bucket == nullptr; }
+    bool const iskey(Key keya) { return keya == key;}
   };
   typedef Pair<Key, Value> Data;
   typedef LINKEDLIST::Linked_List<Data> Map;
@@ -326,20 +331,35 @@ public:
   explicit HashMap<Key, Value>(size_t inital_capacity = DEFAULT_CAPACITY)
       : AssociativeArray(Map()), load_factor(0),
         current_capacity(inital_capacity) {
-    for (size_t i = 0; i < inital_capacity; i++)
-      AssociativeArray.insert(Data());
+    //for (size_t i = 0; i < inital_capacity; i++)
+    //  AssociativeArray.insert();
   }
 
   // CONST MEMBER FUNCTIONS
+//?  bool value_exists(const Data &value) const {
+//?    for (Index i = 0; i < AssociativeArray.size(); i++) {
+//?      if (value == AssociativeArray[i].value) {
+//?        return true;
+//?      }
+//?    }
+//?    return false;
+//?  }
 
-  bool key_exists(const Key key) const { return false; }
+  bool key_exists(const Key key) {
+    for (Index i = 0; i < AssociativeArray.size(); i++) {
+if (key == AssociativeArray[i].iskey(key)) { return true;}
+      }
+return false;
+      }
   bool value_exists(const Data value) const { return true; }
-  bool empty() { return false; }
+  bool empty() { return size() == 0; }
+
+  
   bool full() { return false; }
   size_t size() {
     size_t counter = 0;
     for (size_t i = 0; i < AssociativeArray.size(); i++) {
-      if (AssociativeArray[i].Bucket) {
+      if (!AssociativeArray[i].empty()) {
         counter += 1;
       }
     }
