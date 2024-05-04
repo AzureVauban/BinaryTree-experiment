@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdio>
 #include <iostream>
+#include <utility>
 
 namespace LINKEDLIST {
 
@@ -61,7 +62,9 @@ private:
 public:
   // CONST MEMBER FUNCTIONS
 
-  const Data &at(Node *node) const { return const_cast<Data>(node->value); }
+  const Data& at(const size_t index) {
+    return get_node(index)->value;
+  }
 
   Node *get_node(size_t index) {
     if (isinvalidindex(index)) {
@@ -221,6 +224,9 @@ public:
 
   void clear() {
     const size_t sizecopy = size();
+    if (isempty()) {
+    return;
+    }
     for (int i = 0; i < sizecopy; i++) {
       remove();
     }
@@ -246,7 +252,7 @@ public:
 template <class Data> Linked_List<Data> Copy(Linked_List<Data> &Source) {
   Linked_List<Data> Copied;
   size_t n = Source.size();
-  for (size_t index = 0; index != n; index++) {
+  for (size_t index = 0; index < n; index++) {
     Copied.insert(Source.get_node(index)->value);
   }
   return Copied;
@@ -265,31 +271,81 @@ Linked_List<Data> operator+(Linked_List<Data> &Left, Linked_List<Data> &Right) {
 
 } // namespace LINKEDLIST
 
-namespace JACKSONHASH {
+namespace HASHMAP {
 
 // complete binary tree of Buckets, each Bucket is a Linked List corresponding
 // to a key
-template <class DataType_A, class DataType_B> struct HashMap {
+template <class DataType_A, class DataType_B>
+struct HashMap { // THINK VENDING MACHINE
   typedef DataType_A Key;
   typedef DataType_B Value;
-  typedef std::pair<Key, Value> Data;
-  typedef LINKEDLIST::Linked_List<Data> HashBucket; // Complete Binary Tree
-  typedef LINKEDLIST::Linked_List<HashBucket> Map;
+  typedef size_t Index;
+  static const size_t DEFAULT_CAPACITY = 10;
   // DECLARATION: NAMESPACE::Hashmap<KEY_DATATYPE,VALUE_DATATYPE>VARNAME;
   // STD::HashMap<studentID,studentname>StudentsDatabase;
-  void insert(const Key key, const Value value);
-  void remove(const Key key);
-  size_t size() const { return 0; }
-  bool exists(const Key key) const { return false; }
 
 private:
+  template <class Key, class Value> struct Pair {
+    Key key;
+    Value *Bucket;
+
+  public:
+    explicit Pair<Key, Value>(Key key = Key(), Value *v = nullptr)
+        : key(key), Bucket(v) {}
+  };
+  typedef Pair<Key, Value> Data;
+  typedef LINKEDLIST::Linked_List<Data> Map;
+  size_t current_capacity;
   float load_factor;
-  size_t Hash(Key key) const { return 0; }
-  Map Table;
+  Map AssociativeArray;
 
 public:
-  explicit HashMap<Key, Value>() : Table(Map()), load_factor(0) {}
-  ~HashMap() { Table.clear(); }
+  explicit HashMap<Key, Value>(size_t inital_capacity = DEFAULT_CAPACITY)
+      : AssociativeArray(Map()), load_factor(0),
+        current_capacity(inital_capacity) {
+    for (size_t i = 0; i < inital_capacity; i++)
+      AssociativeArray.insert(Data());
+  }
+
+  // CONST MEMBER FUNCTIONS
+
+  bool key_exists(const Key key) const { return false; }
+  bool value_exists(const Data value) const { return true; }
+  bool empty() { return false; }
+  bool full() { return false; }
+  size_t size() {
+    size_t counter = 0;
+    for (size_t i = 0; i < AssociativeArray.size(); i++) {
+      if (AssociativeArray[i].Bucket) {
+        counter += 1;
+      }
+    }
+    return counter;
+  }
+  Key get_key(const Data value) { Key(); }
+  Data get_value(const Key key) { return Data(); }
+
+private:
+  // HELPER FUNCTIONS
+
+  float calc_load_factor() { return 0.00; } // load factor = capacity / used
+  float max_load_factor() { return 1.00; }
+  Key Hash(Value value) const { return Key(); }
+  Key Rehash(Index index) { Key(); }
+
+public:
+  // MUTATOR MEMBER FUNCTIONS
+
+  void resize(size_t newcapacity) {}
+  void insert(const Key key, Value value) {}
+  void remove(const Key key) {}
+  void clear() {}
+
+  // OVERLOADED OPERATORS
+
+  void operator=(Map &Source) {}
+  Data operator[](const Key key) {}
+  ~HashMap() { AssociativeArray.clear(); }
 };
-} // namespace JACKSONHASH
+} // namespace HASHMAP
 #endif // LINKED_LIST_H

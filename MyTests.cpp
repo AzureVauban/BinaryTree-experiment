@@ -1,29 +1,13 @@
+#include "HiddenTests.h"
 #include "LinkedList.h"
 #include <cassert>
 #include <cstddef>
 #include <cstdlib>
-#include <fstream>
-#include <random>
 #include <string>
-#include <vector>
 
-// The 'randomBetween' function generates a random integer between two given
-// integers 'a' and 'b'. It uses the Mersenne Twister algorithm for random
-// number generation.
-int randomBetween(int a, int b) {
-  std::random_device rd;  // obtain a random number from hardware
-  std::mt19937 gen(rd()); // seed the generator
-  std::uniform_int_distribution<> distr(a, b); // define the range
-
-  return distr(gen); // generate numbers
-}
-
-// The 'CreateList' function generates a linked list of unique random
-// integers. The size of the list is determined by the 'capacity' parameter.
-LINKEDLIST::Linked_List<int> CreateIntList(const size_t, const int, const int);
+const static int TESTCASES = 1000;
 template <typename T> class LinkedListUnitTest {
   typedef LINKEDLIST::Linked_List<T> Array;
-  const static int TESTCASES = 1000;
   // The 'PRINTDEBUGLIST' function prints the size, maximum index, and elements
   // of a given linked list 'List'. It is used for debugging purposes.
   void PRINTDEBUGLIST(Array &List) {
@@ -38,20 +22,25 @@ template <typename T> class LinkedListUnitTest {
   // comparing the first element of the list with an expected value. It returns
   // 'true' if the test passes and 'false' otherwise.
   bool test_peek(Array &List) {
-    std::vector<T> expectedList;
-    for (int i = 0; i < List.size(); i++) {
-      expectedList.emplace_back(List[i]);
+    if (List.isempty()) {
+      std::cout << "LIST IS EMPTY, SKIPPING TEST" << std::endl;
+      return true;
     }
-    return List[0] == expectedList[0];
+    T expectedList = List[0];
+    return List.at(0) == expectedList;
   }
 
   // This 'test_infunction' function tests the insertion and duplicate value
   // checking operations of a linked list.It returns 'true' if a duplicate value
   // is found and 'false' otherwise.
   bool test_infunction(Array &List) {
+    if (List.isempty() || List.size() == 0) {
+      std::cout << "LIST IS EMPTY, SKIPPING TEST" << std::endl;
+      return true;
+    }
     const size_t ListSize = List.size();
 
-    int targetvalue = List[randomBetween(0, ListSize - 1)];
+    T targetvalue = List[randomBetween(0, ListSize - 1)];
     std::cout << "CHECKING TO SEE IF [" << targetvalue << "] IS A PRESENT VALUE"
               << std::endl;
     return List.in(targetvalue);
@@ -62,6 +51,10 @@ template <typename T> class LinkedListUnitTest {
   // successful.The function returns 'true' if the test passes and
   // 'false' otherwise.
   bool test_swap(Array &List) {
+    if (List.isempty() || List.size() == 0) {
+      std::cout << "LIST IS EMPTY, SKIPPING TEST" << std::endl;
+      return true;
+    }
 
     if (List.size() == 1) {
       std::cout << "SKIPPING TEST BECAUSE LIST ONLY HAS 1 VALUE" << std::endl;
@@ -87,6 +80,10 @@ template <typename T> class LinkedListUnitTest {
   // chosen element from a given linked list. It then checks and returns whether
   // the value at the chosen index has changed, indicating successful removal.
   bool test_remove(Array &List) {
+    if (List.isempty() || List.size() == 0) {
+      std::cout << "LIST IS EMPTY, SKIPPING TEST" << std::endl;
+      return true;
+    }
     if (List.size() == 1) {
       List.remove(0);
       return List.isempty();
@@ -124,6 +121,10 @@ template <typename T> class LinkedListUnitTest {
   }
 
   bool test_clear(Array &List) {
+    if (List.isempty()) {
+      std::cout << "LIST IS EMPTY, SKIPPING TEST" << std::endl;
+      return true;
+    }
     size_t n = List.size();
     std::cout << "DELETING OF " << n << " VALUES" << std::endl;
     List.reverse();
@@ -133,38 +134,32 @@ template <typename T> class LinkedListUnitTest {
   }
 
 public:
-  void RunTests() {
-    for (size_t t = 0; t <= TESTCASES; t++) {
-      std::cout << "TESTCASE: " << t << std::endl;
-      for (int i = 0; i != 80; i++) {
-        std::cout << '=';
-      }
-      const int TESTSIZE = randomBetween(3, 20);
+  void RunTests(Array &List, const size_t TESTCASE) {
 
-      Array List;
-      for (int j = 0; j < TESTSIZE; j++) {
-        int chosen_value = randomBetween(0, 1000);
-        if (!List.in(chosen_value)) {
-          List.insert(chosen_value);
-        }
-      }
-      std::cout << std::endl;
-      PRINTDEBUGLIST(List);
-      assert(test_peek(List));
-      assert(test_infunction(List));
-      std::cout << std::endl;
-      assert(test_swap(List));
-      assert(test_remove(List));
-      // assert(test_reverse(List));
-      assert(test_clear(List));
+    std::cout << "TESTCASE: " << TESTCASE << std::endl;
+    for (int i = 0; i != 80; i++) {
+      std::cout << '=';
     }
+
+    std::cout << std::endl;
+    PRINTDEBUGLIST(List);
+    assert(test_peek(List));
+    assert(test_infunction(List));
+    assert(test_swap(List));
+    assert(test_remove(List));
+    // assert(test_reverse(List));
+    assert(test_clear(List));
+  }
+  LinkedListUnitTest(Array &TList, size_t TESTCASE) {
+    Array Test_Clone = LINKEDLIST::Copy(TList);
+    RunTests(Test_Clone, TESTCASE);
   }
 };
 
 template <class Key, class B> class HashMapUnitTest {
   // implement as a complete binary tree of buckets
   // the bucket is a linked list
-  typedef JACKSONHASH::HashMap<Key, B> Value;
+  typedef HASHMAP::HashMap<Key, B> Value;
   size_t TESTCASE_NUM;
   // TEST FUNCTIONS
   bool test_echo() {
@@ -182,44 +177,15 @@ public:
   ~HashMapUnitTest() {}
 };
 int main() {
-  using namespace JACKSONHASH;
-  // LinkedListUnitTest<int> mytests;
-  // mytests.RunTests();
-  HashMap<int, std::string> Map;
-  std::ifstream file("../names.txt");
-  std::string str;
-  if (!file.is_open()) {
-    std::cout << "Unable to open file.\n";
-    return 1; // or exit(1);
+  using namespace HASHMAP;
+  for (size_t i = 0; i < 100; i++) {
+    LINKEDLIST::Linked_List<std::string> Fruits = FruityList();
+    LinkedListUnitTest<std::string> mystringstests(Fruits, i);
   }
-  while (std::getline(file, str)) {
-    std::cout << "ADDING " << str << std::endl;
+  for (size_t i = 0; i < 100; i++) {
+    HashMap<int, std::string> Map;
+    HashMapUnitTest<int, std::string> hashMapUnitTest(Map, i);
   }
-    //Map.insert(0, str);
-
-  HashMapUnitTest<int, std::string> hashMapUnitTest(Map, 0);
   std::cout << "TERMINATING PROCESS" << std::endl;
   return 0;
-}
-
-LINKEDLIST::Linked_List<int> CreateIntList(const size_t capacity = 10,
-                                           const int min = 0,
-                                           const int max = 10) {
-  std::vector<int> values;
-  LINKEDLIST::Linked_List<int> intArray;
-  for (int i = 0; i < capacity; i++) {
-    int chosen_value = randomBetween(min, max);
-    bool value_exists = false;
-    for (int j = 0; j < values.size(); j++) {
-      if (values.at(j) == chosen_value) {
-        value_exists = true;
-        break;
-      }
-    }
-    if (!value_exists) {
-      values.emplace_back(chosen_value);
-      intArray.insert(chosen_value);
-    }
-  }
-  return intArray;
 }

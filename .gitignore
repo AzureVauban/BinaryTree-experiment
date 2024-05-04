@@ -1,7 +1,5 @@
 /.vscode
-/.catch2
-main.exe
-notes.txt
-notes2.txt
-notes3.txt
 MyTests.exe
+HiddenTests.h
+MyTests.exe
+names.txt
