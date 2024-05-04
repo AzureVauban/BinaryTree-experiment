@@ -6,6 +6,7 @@
 #include <functional>
 #include <iostream>
 #include <iterator>
+#include <ostream>
 #include <utility>
 
 namespace LINKEDLIST {
@@ -318,11 +319,32 @@ private:
   public:
     explicit Pair<Key, Value>(Key &key, Value *v = nullptr)
         : key(key), Bucket(v) {}
+
+    typedef Pair<Key, Value> P;
+    typedef std::ostream os;
+    friend os &operator<<(os &output, const P &pair) {
+      output << "{";
+      output << pair.key << ":";
+      if (!pair.Bucket) {
+        output << "0x0";
+      } else {
+        output << pair.Bucket;
+      }
+      output << "}";
+      return output;
+    }
     bool empty() const { return Bucket == nullptr; }
-    bool const iskey(Key keya) { return keya == key;}
+    bool const iskey(Key _key) { return _key == _key; }
+    bool const isvalue(Value v) {
+      if (!Bucket) {
+        return false;
+      }
+      return true;
+    }
   };
-  typedef Pair<Key, Value> Data;
-  typedef LINKEDLIST::Linked_List<Data> Map;
+
+  typedef Pair<Key, Value> MapElement;
+  typedef LINKEDLIST::Linked_List<MapElement> Map;
   size_t current_capacity;
   float load_factor;
   Map AssociativeArray;
@@ -330,43 +352,58 @@ private:
 public:
   explicit HashMap<Key, Value>(size_t inital_capacity = DEFAULT_CAPACITY)
       : AssociativeArray(Map()), load_factor(0),
-        current_capacity(inital_capacity) {
-    //for (size_t i = 0; i < inital_capacity; i++)
-    //  AssociativeArray.insert();
-  }
+        current_capacity(inital_capacity) {}
 
   // CONST MEMBER FUNCTIONS
-//?  bool value_exists(const Data &value) const {
-//?    for (Index i = 0; i < AssociativeArray.size(); i++) {
-//?      if (value == AssociativeArray[i].value) {
-//?        return true;
-//?      }
-//?    }
-//?    return false;
-//?  }
+  //?  bool value_exists(const Data &value) const {
+  //?    for (Index i = 0; i < AssociativeArray.size(); i++) {
+  //?      if (value == AssociativeArray[i].value) {
+  //?        return true;
+  //?      }
+  //?    }
+  //?    return false;
+  //?  }
 
   bool key_exists(const Key key) {
+    if (isempty()) {
+      return false;
+    }
     for (Index i = 0; i < AssociativeArray.size(); i++) {
-if (key == AssociativeArray[i].iskey(key)) { return true;}
-      }
-return false;
-      }
-  bool value_exists(const Data value) const { return true; }
-  bool empty() { return size() == 0; }
 
-  
+      if (AssociativeArray[i].iskey(key)) {
+        return true;
+      }
+    }
+    return false;
+  }
+  bool value_exists(const Value value) {
+    if (isempty()) {
+      return false;
+    }
+    // parse through the Map's List
+    for (Index i = 0; i < AssociativeArray.size(); i++) {
+      MapElement &temp = AssociativeArray[i];
+      bool valueispresent = temp.isvalue(value);
+      if (valueispresent) {
+        return true;
+      }
+    }
+    return false;
+  }
+  bool isempty() { return size() == 0; }
+
   bool full() { return false; }
   size_t size() {
     size_t counter = 0;
-    for (size_t i = 0; i < AssociativeArray.size(); i++) {
+    for (Index i = 0; i < AssociativeArray.size(); i++) {
       if (!AssociativeArray[i].empty()) {
         counter += 1;
       }
     }
     return counter;
   }
-  Key get_key(const Data value) { Key(); }
-  Data get_value(const Key key) { return Data(); }
+  Key get_key(const MapElement value) { Key(); }
+  MapElement get_value(const Key key) { return MapElement(); }
 
 private:
   // HELPER FUNCTIONS
@@ -380,15 +417,44 @@ public:
   // MUTATOR MEMBER FUNCTIONS
 
   void resize(size_t newcapacity) {}
-  void insert(const Key key, Value value) {}
+  void insert(const Key key, Value value) {
+    // k = KEY EXISTS, v = VALUE EXIST
+    // (k && v) // do nothing
+    // (k && !v) // overwrite value at key
+    // (!k && v) // do nothing
+    // (!k && !v) // do insert(k,v)
+    const bool kPresent = key_exists(key), vPresent = value_exists(value);
+  }
   void remove(const Key key) {}
   void clear() {}
 
   // OVERLOADED OPERATORS
 
   void operator=(Map &Source) {}
-  Data operator[](const Key key) {}
-  ~HashMap() { AssociativeArray.clear(); }
+  MapElement operator[](const Key key) {}
+
+  typedef std::ostream os;
+  friend os &operator<<(os &output, const HashMap<Key, Value> &Map) {
+    //   Pair<Key, Value>(Key &key, Value *v = nullptr) : key(key), Bucket(v) {}
+    output << "{";
+    LINKEDLIST::Linked_List<MapElement> map_value = Map.AssociativeArray;
+    for (Index i = 0; i < Map.current_capacity; i++) {
+      //! PASSING KEY BY REFERENCE IN PAIR MAKES IT HARDER TO PRINT
+      if (i != Map.current_capacity - 1) {
+        output << "{},";
+      } else { //? if at last element
+        output << "{}";
+      }
+    }
+    output << "}";
+    return output;
+  }
+
+  ~HashMap() {
+    // std::cout << AssociativeArray << std::endl;
+    // std::cout << this << std::endl;
+    AssociativeArray.clear();
+  }
 };
 } // namespace HASHMAP
 #endif // LINKED_LIST_H

@@ -157,42 +157,88 @@ public:
   }
 };
 
-template <class Key, class B> class HashMapUnitTest {
+template <class Key, class Value> class HashMapUnitTest {
   // implement as a complete binary tree of buckets
   // the bucket is a linked list
-  typedef HASHMAP::HashMap<Key, B> Value;
+  typedef HASHMAP::HashMap<Key, Value> HashMap;
   typedef LINKEDLIST::Linked_List<Key> TestKeys;
+  typedef LINKEDLIST::Linked_List<Value> TestValues;
   size_t TESTCASE_NUM;
   // TEST FUNCTIONS
   bool test_echo() {
     std::cout << "NOT IMPLEMENTED YET" << std::endl;
     return true;
   }
-  bool test_isempty(Value Map) { return Map.empty(); }
+  bool test_isempty(HashMap Map) { return Map.isempty(); }
 
-  bool Test_keyexists(const Value &Map, Key &key) {
+  bool test_keyexists(HashMap &Map, Key &test_key) {
     // USE TEST KEY
-    std::cout << "TESTING KEY: " << key << std::endl;
-    // const bool keyispresent = Map.key_exists(key);
-    return true;
+    std::cout << "TESTING KEY: " << test_key << std::endl;
+    const bool test_keyexists = Map.key_exists(test_key);
+    if (!test_keyexists) {
+      std::cout << "KEY \x1B[31m" << test_key << "\x1B[0m IS NOT IN THE MAP"
+                << std::endl;
+    } else {
+      std::cout << "KEY \x1B[32m" << test_key << "\x1B[0m IS IN THE MAP"
+                << std::endl;
+    }
+    return test_keyexists;
+  }
+
+  bool test_valueexists(HashMap &Map, Value &test_value) {
+    // USE TEST VALUE
+    std::cout << "TESTING KEY: " << test_value << std::endl;
+    const bool test_valueexists = Map.value_exists(test_value);
+    if (!test_valueexists) {
+      std::cout << "VALUE \x1B[31m" << test_value
+                << "\x1B[0m IS NOT IN THE MAP\n"
+                << std::endl;
+    } else {
+      std::cout << "VALUE \x1B[32m" << test_value << "\x1B[0m IS IN THE MAP\n"
+                << std::endl;
+    }
+    return test_valueexists;
+  }
+
+  bool test_insert(HashMap &Map, Key &test_key, Value &test_value) {
+    const size_t oldMapsize = Map.size();
+    Map.insert(test_key, test_value);
+    bool test_success = oldMapsize < Map.size();
+    if (!test_success) {
+      std::cout << "FAILED TO INSERT {\x1B[33m" << test_key
+                << "\x1B[0m:\x1B[36m" << test_value << "\x1B[0m}" << std::endl;
+    }
+    return test_success;
   }
   // TEST DRIVER
-  void UnitTests(Value &value, TestKeys &Keys, size_t TESTCASE) {
+  void UnitTests(HashMap &Map, TestKeys &Keys, TestValues &Values,
+                 size_t TESTCASE) {
     std::cout << "TESTCASE: " << TESTCASE << std::endl;
     for (int i = 0; i != 80; i++) {
       std::cout << '=';
     }
     std::cout << std::endl;
-    assert(test_isempty(value));
+    std::cout << "KEYS: " << Keys << std::endl;
+    assert(test_isempty(Map));
     for (size_t index = 0; index < Keys.size(); index++) {
-      assert(Test_keyexists(value, Keys[index])); //todo finish this test
+      assert(!test_keyexists(Map, Keys[index]));
     }
+    for (size_t index = 0; index < Values.size(); index++) {
+      assert(!test_valueexists(Map, Values[index]));
+    }
+    std::cout << std::endl;
+    Key red = Keys[randomBetween(0, Keys.size() - 1)];
+    Value blue = Values[randomBetween(0, Values.size() - 1)];
+    assert(!test_insert(Map, red, blue));
   }
 
 public:
-  HashMapUnitTest(Value &Map, TestKeys &Keys, const size_t TESTCASE) {
+  explicit HashMapUnitTest(HashMap &Map, TestKeys &Keys, TestValues &Values,
+                           const size_t TESTCASE) {
     TESTCASE_NUM = TESTCASE;
-    UnitTests(Map, Keys, TESTCASE);
+    std::cout << Map << std::endl;
+    UnitTests(Map, Keys, Values, TESTCASE);
+    std::cout << Map << std::endl;
   };
   ~HashMapUnitTest() {}
 };
@@ -205,11 +251,14 @@ int main() {
     LINKEDLIST::Linked_List<std::string> Fruits = GenerateRandomStringList(10);
     LinkedListUnitTest<std::string> mystringstests(Fruits, i);
   }
-  LINKEDLIST::Linked_List<std::string> randomkeys =
-      GenerateRandomStringList(10);
+
   for (size_t i = 0; i < TESTCASES; i++) {
-    HashMap<std::string, std::string> Map;
-    HashMapUnitTest<std::string, std::string> hashMapUnitTest(Map, randomkeys, i);
+    LINKEDLIST::Linked_List<std::string> testkeys =
+        GenerateRandomStringList(20);
+    LINKEDLIST::Linked_List<int> testvalues = GenerateIntList(20);
+    HashMap<std::string, int> Map;
+    HashMapUnitTest<std::string, int> hashMapUnitTest(Map, testkeys, testvalues,
+                                                      i);
   }
   std::cout << "TERMINATING PROCESS" << std::endl;
   return 0;
