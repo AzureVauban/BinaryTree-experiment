@@ -62,9 +62,7 @@ private:
 public:
   // CONST MEMBER FUNCTIONS
 
-  const Data& at(const size_t index) {
-    return get_node(index)->value;
-  }
+  const Data &at(const size_t index) { return get_node(index)->value; }
 
   Node *get_node(size_t index) {
     if (isinvalidindex(index)) {
@@ -225,7 +223,7 @@ public:
   void clear() {
     const size_t sizecopy = size();
     if (isempty()) {
-    return;
+      return;
     }
     for (int i = 0; i < sizecopy; i++) {
       remove();
@@ -246,6 +244,22 @@ public:
     return *this; // Return the current list
   }
 
+  typedef Linked_List<datatype_T> Array;
+  friend std::ostream &operator<<(std::ostream &os, const Array &list) {
+    os << '[';
+    Node *current = list.head;
+    while (current) {
+      if (!current->next) {
+        os << current->value << "";
+      } else {
+        os << current->value << ", ";
+      }
+      current = current->next;
+    }
+    os << ']';
+    return os;
+  }
+
   ~Linked_List() { clear(); }
 };
 
@@ -257,6 +271,7 @@ template <class Data> Linked_List<Data> Copy(Linked_List<Data> &Source) {
   }
   return Copied;
 }
+
 template <class Data>
 Linked_List<Data> operator+(Linked_List<Data> &Left, Linked_List<Data> &Right) {
   Linked_List<Data> Array;
@@ -267,6 +282,15 @@ Linked_List<Data> operator+(Linked_List<Data> &Left, Linked_List<Data> &Right) {
     Array.insert(Right[index]);
   }
   return Array;
+}
+
+template <class Data>
+Linked_List<Data> operator+=(Linked_List<Data> &Left,
+                             Linked_List<Data> &Right) {
+  for (size_t index = 0; index < Right.size(); index++) {
+    Left.insert(Right[index]);
+  }
+  return Left;
 }
 
 } // namespace LINKEDLIST
@@ -288,7 +312,6 @@ private:
   template <class Key, class Value> struct Pair {
     Key key;
     Value *Bucket;
-
   public:
     explicit Pair<Key, Value>(Key key = Key(), Value *v = nullptr)
         : key(key), Bucket(v) {}

@@ -3,9 +3,9 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdlib>
+#include <iostream>
 #include <string>
 
-const static int TESTCASES = 1000;
 template <typename T> class LinkedListUnitTest {
   typedef LINKEDLIST::Linked_List<T> Array;
   // The 'PRINTDEBUGLIST' function prints the size, maximum index, and elements
@@ -14,7 +14,7 @@ template <typename T> class LinkedListUnitTest {
     std::cout << "SIZE: " << List.size() << std::endl;
     std::cout << "MAX INDEX: " << List.size() - 1 << std::endl;
 
-    List.print_list(true);
+    std::cout << List << std::endl;
     std::cout << std::endl;
   }
 
@@ -69,9 +69,9 @@ template <typename T> class LinkedListUnitTest {
     int left = randomBetween(0, (ListSize / 2) - 1);
     int right = randomBetween(left, ListSize - 1);
     std::cout << "SWAPPING INDEX " << left << ":" << right << std::endl;
-    List.print_list(true);
+    std::cout << List << std::endl;
     List.swap(left, right);
-    List.print_list(true);
+    std::cout << List << std::endl;
     return List[left] == expectedList[right] &&
            List[right] == expectedList[left];
   }
@@ -94,7 +94,7 @@ template <typename T> class LinkedListUnitTest {
     std::cout << "REMOVING " << chosen_value << " AT " << chosen_index
               << std::endl;
     List.remove(chosen_index);
-    List.print_list(true);
+    std::cout << List << std::endl;
     // check if the value at the chosen index is the same as the chosen value
     int index_to_check = chosen_index - 1;
     if (index_to_check < 0) {
@@ -105,12 +105,12 @@ template <typename T> class LinkedListUnitTest {
   }
 
   bool test_reverse(Array List) {
-    std::cout << "PRE REVERSE:  ";
-    List.print_list(true);
+    std::cout << "PRE REVERSE:  " << List;
+    // List.print_list(true);
     Array ReversedList = Copy(List);
-    std::cout << "POST REVERSE: ";
+    std::cout << "POST REVERSE: " << List;
     ReversedList.reverse();
-    ReversedList.print_list(true);
+    //! ReversedList.print_list(true);
     size_t n = List.size();
     for (size_t i = 0; i < n; i++) {
       if (List[i] != ReversedList[n - 1 - i]) {
@@ -128,7 +128,8 @@ template <typename T> class LinkedListUnitTest {
     size_t n = List.size();
     std::cout << "DELETING OF " << n << " VALUES" << std::endl;
     List.reverse();
-    List.print_list(true);
+    // List.print_list(true);
+    std::cout << List << std::endl;
     List.clear();
     return List.isempty();
   }
@@ -177,12 +178,14 @@ public:
   ~HashMapUnitTest() {}
 };
 int main() {
+  const static int TESTCASES = 100;
   using namespace HASHMAP;
-  for (size_t i = 0; i < 100; i++) {
-    LINKEDLIST::Linked_List<std::string> Fruits = FruityList();
+
+  for (size_t i = 0; i < TESTCASES; i++) {
+    LINKEDLIST::Linked_List<std::string> Fruits = GenerateRandomStringList(10);
     LinkedListUnitTest<std::string> mystringstests(Fruits, i);
   }
-  for (size_t i = 0; i < 100; i++) {
+  for (size_t i = 0; i < TESTCASES; i++) {
     HashMap<int, std::string> Map;
     HashMapUnitTest<int, std::string> hashMapUnitTest(Map, i);
   }
