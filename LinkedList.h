@@ -44,13 +44,11 @@ private:
   }
   // index is only valid if index >= 0 && index < size()
   bool isindexvalid(size_t index) const {
-    // const size_t n = size();
     return index >= 0 && index < current_size;
   }
 
   bool isinvalidindex(const size_t index) const {
     return index < 0 && index >= current_size;
-  
   }
   Node *get_endpoint() {
     if (isempty()) {
@@ -66,20 +64,25 @@ private:
 public:
   // CONST MEMBER FUNCTIONS
 
-  const Data &at(const size_t index) { return get_node(index)->value; }
+  const Data &at(const size_t index) const { return get_node(index)->value; }
 
-  Node *get_node(size_t index) {
+  Node *get_node(size_t index) const {
     if (isinvalidindex(index)) {
       return nullptr;
     }
     if (index == size() - 1) {
-      return get_endpoint();
+      Node *current = head;
+      while (current->next) {
+        current = current->next;
+      }
+      return current;
+      // return get_endpoint();
     } else if (index == 0) {
       return head;
     } else {
       // traverse to the node
       Node *current = head;
-      while (current->index < index ) {
+      while (current->index < index) {
         current = current->next;
       }
       return current;
@@ -100,21 +103,6 @@ public:
       current = current->next;
     }
     return false;
-  }
-  // MISC HELPER FUNCTIONS
-
-  void print_list(const bool includeWS = false) {
-    Node *current = head;
-    while (current) {
-
-      if (includeWS) {
-        std::cout << current->value << " ";
-      } else {
-        std::cout << current->value;
-      }
-      current = current->next;
-    }
-    std::cout << std::endl;
   }
   // MUTATOR MEMBER FUNCTIONS
 
@@ -175,25 +163,7 @@ public:
       delete head;
       head = nullptr;
       current_size = 0;
-    }
-    //! else if (index == 0) { // if no parent (index = 0)
-    //!
-    //!   // REWRITE THIS PART, COULD BECAUSE OF SEG FAULTS IN HASH MAP
-    //!   Node *old_head = head,
-    //!        *new_head = nullptr;
-    //!   if (old_head->next) {
-    //!     new_head = old_head->next;
-    //!     //delete  old_head->next;
-    //!     old_head->next = nullptr;
-    //!   }
-    //!   head = new_head;
-    //!   current_size = current_size - 1;
-    //!  //delete old_head;
-    //!   //old_head = nullptr;
-    //!  // reindex();
-    //!   return;
-    //! } // if no child
-    else if (index == n - 1) {
+    } else if (index == n - 1) {
       // traverse to the second last Node
       Node *current = head, *current_prev = nullptr;
       while (current->next) {
@@ -213,7 +183,7 @@ public:
       // if parent and child at index
       for (int current = index; current < n - 1; current++) {
         // if (current == 0) { break; }
-        Node *NodeA = get_node(current), *NodeB = get_node(current + 1); //! MEMORY UNSAFE
+        Node *NodeA = get_node(current), *NodeB = get_node(current + 1);
         NodeA->value = NodeB->value;
       }
       remove(size() - 1);
@@ -454,6 +424,14 @@ public:
     // (!k && v) // do nothing
     // (!k && !v) // do insert(k,v)
     const bool kPresent = key_exists(key), vPresent = value_exists(value);
+
+    if (!kPresent && !vPresent) {
+      // do insert (k,v)
+    } else if (kPresent && !vPresent) {
+      // overwrite value at key
+    } else {
+      // do nothing
+    }
   }
   void remove(const Key key) {}
   void clear() {}
@@ -465,19 +443,27 @@ public:
 
   typedef std::ostream os;
   friend os &operator<<(os &output, const HashMap<Key, Value> &Map) {
+
     //   Pair<Key, Value>(Key &key, Value *v = nullptr) : key(key), Bucket(v) {}
     output << "{";
-    LINKEDLIST::Linked_List<MapElement> map_value = Map.AssociativeArray;
-    for (Index i = 0; i < Map.current_capacity; i++) {
-      //! PASSING KEY BY REFERENCE IN PAIR MAKES IT HARDER TO PRINT
-      //MapElement NEEDNAME1 = map_value[i];
-      output << "{}";
+    for (Index i = 0; i < Map.AssociativeArray.size(); i++) {
+      if (i != Map.AssociativeArray.size() - 1) {
+        output << Map.AssociativeArray.at(i) << ",";
+      } else {
+        output << Map.AssociativeArray.at(i);
+      }
     }
+
     output << "}";
     return output;
+    // WHY DOES PRINTING THE MAP CAUSE CODE HANGS ? ?
+    // IT WAS DUE TO THE FACT THAT THE OPERATION NEEDED TO RETURN CONST, BUT
+    // THE SUB OPERATIONS DID NOT RETURN CONST, aka (any derivative operations
+    // must also return in const)
+    //! do not declare any new variables, only use const functions
   }
 
-  ~HashMap() { std::cout << "DESTORYING HASH MAP\n"; }
+  ~HashMap() {}
 };
 } // namespace HASHMAP
 #endif // LINKED_LIST_H

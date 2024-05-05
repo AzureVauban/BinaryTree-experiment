@@ -237,18 +237,16 @@ public:
   explicit HashMapUnitTest(HashMap Map, TestKeys &Keys, TestValues &Values,
                            const size_t TESTCASE) {
     TESTCASE_NUM = TESTCASE;
-    // std::cout << Map << std::endl;
-    //std::cout << Map << std::endl; //! THIS LINE CAUSES CODE HANGS
+    std::cout << Map << std::endl;
     UnitTests(Map, Keys, Values, TESTCASE);
   };
   ~HashMapUnitTest() {}
 };
 int main() {
-  const static int TESTCASES = 1000;
+  const static int TESTCASES = 100;
   using namespace HASHMAP;
 
   for (size_t i = 0; i < TESTCASES; i++) {
-    break; //! SKIP THIS TEST
     LINKEDLIST::Linked_List<std::string> Fruits = GenerateRandomStringList(10);
     LinkedListUnitTest<std::string> mystringstests(Fruits, i);
   }
@@ -257,10 +255,10 @@ int main() {
     LINKEDLIST::Linked_List<std::string> testkeys =
         GenerateRandomStringList(20);
     LINKEDLIST::Linked_List<int> testvalues = GenerateIntList(20);
-
+    std::cout << HashMap<std::string, int>() << std::endl;
     HashMapUnitTest<std::string, int> hashMapUnitTest(
         HashMap<std::string, int>(), testkeys, testvalues, i);
   }
   std::cout << "TERMINATING PROCESS" << std::endl;
   return 0;
-} //WHY DOES PRINTING THE MAP CAUSE CODE HANGS??
+}
