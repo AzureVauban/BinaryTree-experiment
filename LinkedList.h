@@ -224,7 +224,7 @@ public:
   }
 
   void clear() {
-    const size_t sizecopy = size();
+    const size_t sizecopy = current_size;
     if (isempty()) {
       return;
     }
@@ -313,34 +313,47 @@ struct HashMap { // THINK VENDING MACHINE
 
 private:
   template <class Key, class Value> struct Pair {
-    Key key;
+    Key *key;
     Value *Bucket;
 
   public:
-    explicit Pair<Key, Value>(Key &key, Value *v = nullptr)
+    explicit Pair<Key, Value>(Key *key = nullptr, Value *v = nullptr)
         : key(key), Bucket(v) {}
 
     typedef Pair<Key, Value> P;
     typedef std::ostream os;
     friend os &operator<<(os &output, const P &pair) {
       output << "{";
-      output << pair.key << ":";
-      if (!pair.Bucket) {
+      if (!pair.key) { // print key
         output << "0x0";
       } else {
-        output << pair.Bucket;
+        output << *pair.key;
+      }
+      output << ":";
+      if (!pair.Bucket) { // print bucket
+        output << "0x0";
+      } else {
+        output << *pair.Bucket;
       }
       output << "}";
       return output;
     }
-    bool empty() const { return Bucket == nullptr; }
-    bool const iskey(Key _key) { return _key == _key; }
+    bool empty_bucket() const { return !Bucket; }
+    bool empty_key() const { return !key; }
+    bool empty_keyvalue() const { return empty_key() & empty_bucket(); }
+    bool iskey(Key _key) const {
+      if (empty_key()) {
+        return false;
+      }
+      return &_key == key;
+    }
     bool const isvalue(Value v) {
       if (!Bucket) {
         return false;
       }
       return true;
     }
+    ~Pair() {}
   };
 
   typedef Pair<Key, Value> MapElement;
@@ -350,9 +363,14 @@ private:
   Map AssociativeArray;
 
 public:
+  size_t current_size;
   explicit HashMap<Key, Value>(size_t inital_capacity = DEFAULT_CAPACITY)
       : AssociativeArray(Map()), load_factor(0),
-        current_capacity(inital_capacity) {}
+        current_capacity(inital_capacity), current_size(0) {
+    for (Index i = 0; i < inital_capacity; i++) {
+      AssociativeArray.insert(MapElement(nullptr, nullptr));
+    }
+  }
 
   // CONST MEMBER FUNCTIONS
   //?  bool value_exists(const Data &value) const {
@@ -368,13 +386,14 @@ public:
     if (isempty()) {
       return false;
     }
-    for (Index i = 0; i < AssociativeArray.size(); i++) {
-
-      if (AssociativeArray[i].iskey(key)) {
-        return true;
-      }
-    }
-    return false;
+    // for (Index i = 0; i < AssociativeArray.size(); i++) {
+    //
+    //   if (AssociativeArray[i].iskey(key)) {
+    //     return true;
+    //   }
+    // }
+    // return false;
+    return true;
   }
   bool value_exists(const Value value) {
     if (isempty()) {
@@ -390,17 +409,20 @@ public:
     }
     return false;
   }
-  bool isempty() { return size() == 0; }
+  bool isempty() const { return current_size == 0; }
 
   bool full() { return false; }
-  size_t size() {
+
+  void size() {
     size_t counter = 0;
     for (Index i = 0; i < AssociativeArray.size(); i++) {
-      if (!AssociativeArray[i].empty()) {
+      MapElement stored_value = AssociativeArray[i];
+      // std::cout << stored_value << std::endl;
+      if (!stored_value.empty_keyvalue()) {
         counter += 1;
       }
     }
-    return counter;
+    current_size = counter;
   }
   Key get_key(const MapElement value) { Key(); }
   MapElement get_value(const Key key) { return MapElement(); }
@@ -430,7 +452,7 @@ public:
 
   // OVERLOADED OPERATORS
 
-  void operator=(Map &Source) {}
+  // void operator=(Map &Source) {}
   MapElement operator[](const Key key) {}
 
   typedef std::ostream os;
@@ -440,20 +462,15 @@ public:
     LINKEDLIST::Linked_List<MapElement> map_value = Map.AssociativeArray;
     for (Index i = 0; i < Map.current_capacity; i++) {
       //! PASSING KEY BY REFERENCE IN PAIR MAKES IT HARDER TO PRINT
-      if (i != Map.current_capacity - 1) {
-        output << "{},";
-      } else { //? if at last element
-        output << "{}";
-      }
+      MapElement NEEDNAME1 = map_value[i];
+      output << "{}";
     }
     output << "}";
     return output;
   }
 
   ~HashMap() {
-    // std::cout << AssociativeArray << std::endl;
-    // std::cout << this << std::endl;
-    AssociativeArray.clear();
+    std::cout << "DESTORYING HASH MAP\n";
   }
 };
 } // namespace HASHMAP

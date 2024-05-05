@@ -169,7 +169,7 @@ template <class Key, class Value> class HashMapUnitTest {
     std::cout << "NOT IMPLEMENTED YET" << std::endl;
     return true;
   }
-  bool test_isempty(HashMap Map) { return Map.isempty(); }
+  bool test_isempty(const HashMap &Map) { return Map.current_size == 0; }
 
   bool test_keyexists(HashMap &Map, Key &test_key) {
     // USE TEST KEY
@@ -201,9 +201,9 @@ template <class Key, class Value> class HashMapUnitTest {
   }
 
   bool test_insert(HashMap &Map, Key &test_key, Value &test_value) {
-    const size_t oldMapsize = Map.size();
+    const size_t oldMapsize = Map.current_size;
     Map.insert(test_key, test_value);
-    bool test_success = oldMapsize < Map.size();
+    bool test_success = oldMapsize < Map.current_size;
     if (!test_success) {
       std::cout << "FAILED TO INSERT {\x1B[33m" << test_key
                 << "\x1B[0m:\x1B[36m" << test_value << "\x1B[0m}" << std::endl;
@@ -219,6 +219,7 @@ template <class Key, class Value> class HashMapUnitTest {
     }
     std::cout << std::endl;
     std::cout << "KEYS: " << Keys << std::endl;
+    std::cout << "VALUES: " << Values << std::endl;
     assert(test_isempty(Map));
     for (size_t index = 0; index < Keys.size(); index++) {
       assert(!test_keyexists(Map, Keys[index]));
@@ -227,18 +228,18 @@ template <class Key, class Value> class HashMapUnitTest {
       assert(!test_valueexists(Map, Values[index]));
     }
     std::cout << std::endl;
-    Key red = Keys[randomBetween(0, Keys.size() - 1)];
-    Value blue = Values[randomBetween(0, Values.size() - 1)];
-    assert(!test_insert(Map, red, blue));
+
+    assert(!test_insert(Map, Keys[randomBetween(0, Keys.size() - 1)],
+                        Values[randomBetween(0, Values.size() - 1)]));
   }
 
 public:
-  explicit HashMapUnitTest(HashMap &Map, TestKeys &Keys, TestValues &Values,
+  explicit HashMapUnitTest(HashMap Map, TestKeys &Keys, TestValues &Values,
                            const size_t TESTCASE) {
     TESTCASE_NUM = TESTCASE;
+    // std::cout << Map << std::endl;
     std::cout << Map << std::endl;
     UnitTests(Map, Keys, Values, TESTCASE);
-    std::cout << Map << std::endl;
   };
   ~HashMapUnitTest() {}
 };
@@ -247,7 +248,7 @@ int main() {
   using namespace HASHMAP;
 
   for (size_t i = 0; i < TESTCASES; i++) {
-    break;
+    //break; //! SKIP THIS TEST
     LINKEDLIST::Linked_List<std::string> Fruits = GenerateRandomStringList(10);
     LinkedListUnitTest<std::string> mystringstests(Fruits, i);
   }
@@ -256,9 +257,9 @@ int main() {
     LINKEDLIST::Linked_List<std::string> testkeys =
         GenerateRandomStringList(20);
     LINKEDLIST::Linked_List<int> testvalues = GenerateIntList(20);
-    HashMap<std::string, int> Map;
-    HashMapUnitTest<std::string, int> hashMapUnitTest(Map, testkeys, testvalues,
-                                                      i);
+
+    HashMapUnitTest<std::string, int> hashMapUnitTest(
+        HashMap<std::string, int>(), testkeys, testvalues, i);
   }
   std::cout << "TERMINATING PROCESS" << std::endl;
   return 0;
