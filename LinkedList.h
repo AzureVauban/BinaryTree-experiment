@@ -8,7 +8,7 @@
 #include <iterator>
 #include <ostream>
 #include <utility>
-
+static int HITCOUNTERDEBuG = 0;
 namespace LINKEDLIST {
 
 template <class datatype_K> struct LinkedListNode {
@@ -50,6 +50,7 @@ private:
 
   bool isinvalidindex(const size_t index) const {
     return index < 0 && index >= current_size;
+  
   }
   Node *get_endpoint() {
     if (isempty()) {
@@ -78,7 +79,7 @@ public:
     } else {
       // traverse to the node
       Node *current = head;
-      while (current->index != index) {
+      while (current->index < index ) {
         current = current->next;
       }
       return current;
@@ -174,18 +175,24 @@ public:
       delete head;
       head = nullptr;
       current_size = 0;
-    } else if (index == 0) { // if no parent (index = 0)
-      Node *old_head = head, *new_head = nullptr;
-      if (old_head->next) {
-        new_head = old_head->next;
-        old_head->next = nullptr;
-      }
-      head = new_head;
-      current_size -= 1;
-      delete old_head;
-      reindex();
-      return;
-    } // if no child
+    }
+    //! else if (index == 0) { // if no parent (index = 0)
+    //!
+    //!   // REWRITE THIS PART, COULD BECAUSE OF SEG FAULTS IN HASH MAP
+    //!   Node *old_head = head,
+    //!        *new_head = nullptr;
+    //!   if (old_head->next) {
+    //!     new_head = old_head->next;
+    //!     //delete  old_head->next;
+    //!     old_head->next = nullptr;
+    //!   }
+    //!   head = new_head;
+    //!   current_size = current_size - 1;
+    //!  //delete old_head;
+    //!   //old_head = nullptr;
+    //!  // reindex();
+    //!   return;
+    //! } // if no child
     else if (index == n - 1) {
       // traverse to the second last Node
       Node *current = head, *current_prev = nullptr;
@@ -205,7 +212,8 @@ public:
     else {
       // if parent and child at index
       for (int current = index; current < n - 1; current++) {
-        Node *NodeA = get_node(current), *NodeB = get_node(current + 1);
+        // if (current == 0) { break; }
+        Node *NodeA = get_node(current), *NodeB = get_node(current + 1); //! MEMORY UNSAFE
         NodeA->value = NodeB->value;
       }
       remove(size() - 1);
@@ -224,11 +232,11 @@ public:
   }
 
   void clear() {
-    const size_t sizecopy = current_size;
+    // const size_t sizecopy = current_size;
     if (isempty()) {
       return;
     }
-    for (int i = 0; i < sizecopy; i++) {
+    for (size_t i = current_size; i > 0; i--) {
       remove();
     }
   }
@@ -462,16 +470,14 @@ public:
     LINKEDLIST::Linked_List<MapElement> map_value = Map.AssociativeArray;
     for (Index i = 0; i < Map.current_capacity; i++) {
       //! PASSING KEY BY REFERENCE IN PAIR MAKES IT HARDER TO PRINT
-      MapElement NEEDNAME1 = map_value[i];
+      //MapElement NEEDNAME1 = map_value[i];
       output << "{}";
     }
     output << "}";
     return output;
   }
 
-  ~HashMap() {
-    std::cout << "DESTORYING HASH MAP\n";
-  }
+  ~HashMap() { std::cout << "DESTORYING HASH MAP\n"; }
 };
 } // namespace HASHMAP
 #endif // LINKED_LIST_H
