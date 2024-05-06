@@ -5,10 +5,10 @@
 #include <cstdio>
 #include <functional>
 #include <iostream>
+#include <istream>
 #include <iterator>
 #include <ostream>
 #include <utility>
-static int HITCOUNTERDEBuG = 0;
 namespace LINKEDLIST {
 
 template <class datatype_K> struct LinkedListNode {
@@ -275,7 +275,331 @@ Linked_List<Data> operator+=(Linked_List<Data> &Left,
 }
 
 } // namespace LINKEDLIST
+namespace ASSOCIATIVEARRAY {
 
+template <class DataType_A, class DataType_B> struct AssociativeArray {
+  typedef DataType_A Key;
+  typedef DataType_B Value;
+  typedef size_t Index;
+
+private:
+  template <class Key, class Value> struct Pair {
+    Key *key;
+    Value *Bucket;
+
+  public:
+    explicit Pair<Key, Value>(Key *key = nullptr, Value *v = nullptr)
+        : key(key), Bucket(v) {}
+
+    typedef Pair<Key, Value> P;
+    typedef std::ostream os;
+    friend os &operator<<(os &output, const P &pair) {
+      output << "{";
+      if (!pair.key) { // print key
+        output << "0x0";
+      } else {
+        output << *pair.key;
+      }
+      output << ":";
+      if (!pair.Bucket) { // print bucket
+        output << "0x0";
+      } else {
+        output << *pair.Bucket;
+      }
+      output << "}";
+      return output;
+    }
+    bool empty_bucket() const { return !Bucket; }
+    bool empty_key() const { return !key; }
+    bool empty_keyvalue() const { return empty_key() & empty_bucket(); }
+    bool iskey(Key _key) const {
+      if (empty_key()) {
+        return false;
+      }
+      return &_key == key;
+    }
+    bool const isvalue(Value v) {
+      if (!Bucket) {
+        return false;
+      }
+      return true;
+    }
+    ~Pair() {
+    }
+  };
+
+  typedef Pair<Key, Value> MapElement;
+  typedef LINKEDLIST::Linked_List<MapElement> Map;
+
+  Map Table;
+
+public:
+  static const size_t DEFAULT_CAPACITY = 0;
+  explicit AssociativeArray(size_t inital_size = DEFAULT_CAPACITY)
+      : Table(Map()) {
+    for (Index i = 0; i < inital_size; i++) {
+      Table.insert(MapElement());
+    }
+  }
+  // CONST MEMBER FUNCTIONS
+
+  // current number of key-value pairs
+  //
+  // Pre-condition: None
+  //
+  // Post-condition: Returns the current number of key-value pairs in the table,
+  // which is the count of all pairs, exlcuding non-null pairs.
+  size_t size() const {
+    // return how many non-empty pairs are in the list
+    size_t counter = 0;
+    for (Index i = 0; i < capacity(); i++) {
+      if (!Table.at(i).empty_keyvalue()) {
+        counter += 1;
+      }
+    }
+    return counter;
+  }
+
+  // current size of the table (the table includes nullable pairs representing
+  // {key:value} mappings)
+  //
+  // Pre-condition: None
+  //
+  // Post-condition: Returns the current size of the table, which is the number
+  // of non-null pairs in the table
+  size_t capacity() const { return Table.size(); }
+
+  // Checks if a key exists in the table
+  //
+  // Pre-condition: The key is a valid Key type
+  //
+  // Post-condition: Returns true if the key exists in the table,
+  // false otherwise
+  bool key_exists(const Key key) const {
+    if (isempty()) {
+      return false;
+    }
+    for (Index i = 0; i < Table.size(); i++) {
+      if (Table.at(i).key) {
+        if (*Table.at(i).key == key) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  // Checks if a key exists in the table
+  //
+  // Pre-condition: The key is a valid Key type
+  //
+  // Post-condition: Returns true if the key exists in the table, false
+  // otherwise
+  bool value_exists(const Value value) const {
+    if (isempty()) {
+      return false;
+    }
+    // parse through the Map's List
+    for (Index i = 0; i < Table.size(); i++) {
+      if (Table.at(i).Bucket) {
+        if (*Table.at(i).Bucket == value) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  // Checks if the table is empty
+  //
+  // Pre-condition: None
+  //
+  // Post-condition: Returns true if the table is empty (i.e., size is 0), false
+  // otherwise
+  bool isempty() const { return size() == 0; }
+
+  // Checks if the table is full
+  //
+  // Pre-condition: None
+  //
+  // Post-condition: Returns true if the table is full (i.e., size is equal to
+  // capacity), false otherwise
+  bool isfull() const { return size() == capacity(); }
+  // MUTATOR MEMBER FUNCTION
+
+  // Resizes the table to a new capacity
+  //
+  // Pre-condition: newcapacity is a valid size_t type and is greater than the
+  // current size of the table
+  //
+  // Post-condition: The table's capacity is changed to newcapacity
+  void resize(const size_t newcapacity) { // DEBUG THIS, FOR TEST
+    if (newcapacity == capacity()) { return;}
+    size_t current_table_size = Table.size();
+    const bool INCREASESIZE = newcapacity < current_table_size;
+    if (INCREASESIZE) {
+      // if newcapacity is less than current, remove until capacity reached
+      for (Index i = current_table_size; i > newcapacity; i--) {
+        // prioritze removing empty keys
+        if (!Table.at(i).key) {
+          Table.remove(i);
+        }
+      }
+      // if desired capacity hasn't been reached, remove last value
+      if (newcapacity < Table.size()) {
+        for (Index i = Table.size(); i > newcapacity; i--) {
+          Table.remove(Table.size()-1);
+        }
+      }
+    } else {
+      // if newcapacity is greater than current, insert blank pair
+      for (Index i = current_table_size; i < newcapacity; i++) {
+        // Table.insert(MapElement());
+        Table.insert(MapElement(),Table.size()-1);
+      }
+    }
+  }
+  // Inserts a new key-value pair into the table
+  //
+  // Pre-condition: The key is a valid Key type and the value is a valid Value
+  // type
+  //
+  // Post-condition: The key-value pair is inserted into the table
+  void insert(const Key key, const Value value) {
+    // UNIQUE KEYS, BUT UNIQUNIE VALUES
+
+    // REVISED
+    // (k && v)   // do nothing,  in hash map change key
+    // (k && !v)  // do nothing,  in hash map change key
+    // (!k && v)  // insert,      in hash map insert as usual
+    // (!k && !v) // insert,      in hash map insert as usual
+    // todo IMPLEMENT NEW LOGIC INTO INSERT FUNCTION
+    if (isempty()) {
+      // INSERT FIRST KEY,VALUE PAIR
+      Table.insert(MapElement(new Key(key), new Value(value)));
+      // Table.insert(MapElement());
+      // Table.ins(MapElement(new Key(key), new Value(value)));
+
+      // AssociativeArray[0].key = key;
+      // AssociativeArray[0].Bucket = value;
+      return;
+    }
+    if (isfull()) {
+      const size_t newcapacity = 1 + (capacity() * 2.5);
+      resize(newcapacity);
+    }
+    size_t current_size = size();
+    const bool kPresent = key_exists(key), vPresent = value_exists(value);
+    if (!kPresent && !vPresent) { // do insert (k,v)
+      // find the first empty spot in the Associative Array
+      // CHECK IF FULL
+
+      for (Index i = 0; i < current_size; i++) {
+        if (Table.at(i).empty_keyvalue()) {
+          Table[i] = MapElement(new Key(key), new Value(value));
+          return;
+        }
+      }
+    }
+    if (kPresent && !vPresent) { // overwrite value at key
+      for (Index i = current_size; i < 0; i++) {
+        if (*Table.at(i).key == key) {
+          *Table[i].key = key;
+          return;
+        }
+      }
+    }
+    return;
+  }
+
+  // Removes a key-value pair from the table
+  //
+  // Pre-condition: The table is not empty
+  //
+  // Post-condition: A key-value pair is removed from the table
+  void remove(const Key key) {
+    if (isempty()) {
+      return;
+    }
+    // look for key
+    if (!key_exists(&key)) {
+      return;
+    }
+    // key is confirmed to exist, parse through array to locate its index
+    for (Index i = 0;i < capacity(); i++) {
+      if (*Table.at(i).key == &key) {
+        // empty out & replace
+        Table.remove(i);
+        Table.insert(size()-1);
+      }
+    }
+  }
+
+  // OVERLOADED OPERATORS
+  //
+  // type alias for an instance of the class
+  typedef AssociativeArray<Key, Value> Array;
+  // Overloads the [] operator to access the value associated with a key in the
+  // associative array
+  //
+  // Pre-condition: The key is a valid Key type
+  //
+  // Post-condition: Returns the value associated with the key if it exists,
+  // otherwise returns a default-constructed Key object
+  Value operator[](const Key key) {
+    if (!key_exists(key)) {
+      return Key();
+    }
+    // parse through Map array to locate the key
+    for (Index i = 0; i < Table.size(); i++) {
+      if (*Table[i].key == key) {
+        return *Table[i].value;
+      }
+    }
+  }
+
+//!  Array &operator=(Array &Source) {
+//!    if (this != &Source) {
+//!      Table = Source.Table;
+//!    }
+//!    return *this;
+//!  }
+  Array operator+(const Array &other) const {
+    // Implement merging of associative arrays
+  }
+
+  Array &operator+=(const MapElement &kv) {
+    // Implement insertion/update of key-value pair
+    return *this;
+  }
+  
+  typedef std::ostream os;
+  // Overloads the << operator to print the associative array
+  //
+  // Pre-condition: The output stream is valid and open, and the associative
+  // array is a valid AssociativeArray object
+  //
+  // Post-condition: Prints the associative array to the output stream and
+  // returns the stream
+  friend os &operator<<(os &output, const Array &Map) {
+    output << "{";
+    for (Index i = 0; i < Map.Table.size(); i++) {
+      if (i != Map.Table.size() - 1) {
+        output << Map.Table.at(i) << ",";
+      } else {
+        output << Map.Table.at(i);
+      }
+    }
+    output << "}";
+    return output;
+    // WHY DOES PRINTING THE MAP CAUSE CODE HANGS ? ?
+    // IT WAS DUE TO THE FACT THAT THE OPERATION NEEDED TO RETURN CONST, BUT
+    // THE SUB OPERATIONS DID NOT RETURN CONST, aka (any derivative operations
+    // must also return in const)
+    //! do not declare any new variables, only use const functions
+  }
+};
+} // namespace ASSOCIATIVEARRAY
 namespace HASHMAP {
 
 // complete binary tree of Buckets, each Bucket is a Linked List corresponding
@@ -360,29 +684,29 @@ public:
   //?    return false;
   //?  }
 
-  bool key_exists(const Key key) {
+  bool key_exists(const Key key) const { // todo implement
     if (isempty()) {
       return false;
     }
-    // for (Index i = 0; i < AssociativeArray.size(); i++) {
-    //
-    //   if (AssociativeArray[i].iskey(key)) {
-    //     return true;
-    //   }
-    // }
-    // return false;
-    return true;
+    for (Index i = 0; i < AssociativeArray.size(); i++) {
+      if (AssociativeArray.at(i).key) {
+        if (*AssociativeArray.at(i).key == key) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
-  bool value_exists(const Value value) {
+  bool value_exists(const Value value) const {
     if (isempty()) {
       return false;
     }
     // parse through the Map's List
     for (Index i = 0; i < AssociativeArray.size(); i++) {
-      MapElement &temp = AssociativeArray[i];
-      bool valueispresent = temp.isvalue(value);
-      if (valueispresent) {
-        return true;
+      if (AssociativeArray.at(i).Bucket) {
+        if (*AssociativeArray.at(i).Bucket == value) {
+          return true;
+        }
       }
     }
     return false;
@@ -423,15 +747,36 @@ public:
     // (k && !v) // overwrite value at key
     // (!k && v) // do nothing
     // (!k && !v) // do insert(k,v)
-    const bool kPresent = key_exists(key), vPresent = value_exists(value);
-
-    if (!kPresent && !vPresent) {
-      // do insert (k,v)
-    } else if (kPresent && !vPresent) {
-      // overwrite value at key
-    } else {
-      // do nothing
+    if (isempty()) {
+      // INSERT FIRST KEY,VALUE PAIR
+      AssociativeArray[0] = MapElement(new Key(key), new Value(value));
+      // AssociativeArray[0].key = key;
+      // AssociativeArray[0].Bucket = value;
+      current_size += 1;
+      return;
     }
+    const bool kPresent = key_exists(key), vPresent = value_exists(value);
+    if (!kPresent && !vPresent) { // do insert (k,v)
+      // find the first empty spot in the Associative Array
+      //! MapElement me = AssociativeArray[0];
+      for (Index i = 0; i < current_size;
+           i++) { // todo debug this for insert test
+        if (AssociativeArray.at(i).empty_keyvalue()) {
+          AssociativeArray[i] = MapElement(new Key(key), new Value(value));
+          current_size += 1;
+          return;
+        }
+      }
+      // return;
+    }
+    if (kPresent && !vPresent) { // overwrite value at key
+      //! for (Index i = AssociativeArray.size(); i < 0; i++) {
+      //!   if (AssociativeArray.at(i)->key == key) {
+      //!     AssociativeArray[i]->value = value;
+      //!   }
+      return;
+    }
+    return;
   }
   void remove(const Key key) {}
   void clear() {}
@@ -464,6 +809,8 @@ public:
   }
 
   ~HashMap() {}
+  // Notes:
+  // SAME VALUE BUT NOT KEY, IF KEY EXISTS, CHANGE KEY THEN INSERT
 };
 } // namespace HASHMAP
 #endif // LINKED_LIST_H
