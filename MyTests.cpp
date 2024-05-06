@@ -83,7 +83,7 @@ template <typename T> class LinkedListUnitTest {
   // chosen element from a given linked list. It then checks and returns whether
   // the value at the chosen index has changed, indicating successful removal.
   bool test_remove(Array &List) {
-    if (List.isempty() || List.size() == 0) {
+    if (List.isempty() /*|| List.size() == 0*/) {
       std::cout << "LIST IS EMPTY, SKIPPING TEST" << std::endl;
       return true;
     }
@@ -166,11 +166,12 @@ template <class Key, class Value> class AssociativeArrayUnitTest {
   typedef LINKEDLIST::Linked_List<Value> TestValues;
 
   bool test_isempty(const Array &Array) { return Array.size() == 0; }
-  bool test_keyexists(Array &Map, Key &test_key, const bool debugout = false) {
+  bool test_keyexists(Array &Array, Key &test_key,
+                      const bool debugout = false) {
     // USE TEST KEY
     if (debugout)
       std::cout << "TESTING KEY: " << test_key << std::endl;
-    const bool test_keyexists = Map.key_exists(test_key);
+    const bool test_keyexists = Array.key_exists(test_key);
     if (!test_keyexists && debugout) {
       std::cout << "KEY \x1B[31m" << test_key << "\x1B[0m IS NOT IN THE MAP"
                 << std::endl;
@@ -183,12 +184,12 @@ template <class Key, class Value> class AssociativeArrayUnitTest {
     return test_keyexists;
   }
 
-  bool test_valueexists(Array &Map, Value &test_value,
+  bool test_valueexists(Array &Array, Value &test_value,
                         const bool debugout = false) {
     // USE TEST VALUE
     if (debugout)
       std::cout << "TESTING VALUE: " << test_value << std::endl;
-    const bool test_valueexists = Map.value_exists(test_value);
+    const bool test_valueexists = Array.value_exists(test_value);
     if (!test_valueexists && debugout) {
       std::cout << "VALUE \x1B[31m" << test_value
                 << "\x1B[0m IS NOT IN THE MAP\n"
@@ -246,12 +247,25 @@ template <class Key, class Value> class AssociativeArrayUnitTest {
     }
     return test_sucess;
   }
-  bool test_remove(Array &Map, const bool debugoutput) {
-    bool test_success = false;
+  bool test_remove(Array &Array, const Key key, const bool debugoutput) {
+    if (Array.isempty()) {
+      std::cout << "LIST IS EMPTY, SKIPPING TEST" << std::endl;
+      return true;
+    }
+    if (!Array.key_exists(key)) {
+      std::cout << "KEY DOES NOT EXIST IN ARRAY, SKIPPING TEST" << std::endl;
+      return true;
+    }
+    if (Array.size() == 1) {
+      Array.remove(key);
+      return Array.isempty();
+    }
+    bool test_success = true;
+    std::cout << "NOT IMPLEMENTED\n";
     return test_success;
   }
 
-  bool test_resize(Array &Map, const bool decreasesize = false,
+  bool test_resize(Array &Array, const bool decreasesize = false,
                    const bool debugout = false) {
     // const bool isfull = Map.isfull(); only for debug
     // if (decreasesize) {
@@ -259,9 +273,8 @@ template <class Key, class Value> class AssociativeArrayUnitTest {
     //} else {
     //  std::cout << "ATTEMPTING TO INCREASE THE SIZE OF ARRAY\n";
     //}
-    size_t old_capacity = Map.capacity();
+    const size_t old_capacity = Array.capacity();
     size_t new_capacity = old_capacity;
-    size_t expected_capacity = old_capacity;
     if (decreasesize) {
       new_capacity /= 2;
       // expected_capacity = new_capacity - 1;
@@ -270,24 +283,24 @@ template <class Key, class Value> class AssociativeArrayUnitTest {
       new_capacity += 1;
       // expected_capacity = new_capacity + 1;
     }
-    Map.resize(new_capacity);
+    const size_t expected_capacity = new_capacity;
+    Array.resize(new_capacity);
     // new_capacity = Map.capacity();
     bool test_success = false;
     if (decreasesize) {
-      test_success = Map.capacity() < expected_capacity;
+      test_success = Array.capacity() < old_capacity;
     } else {
-      test_success = Map.capacity() > expected_capacity;
+      test_success = Array.capacity() > old_capacity;
     }
     if (test_success && debugout) {
 
       std::cout << "SUCCESSFULLY RESIZED FROM " << old_capacity
-                << " TO (\x1B[30m" << Map.capacity() << "\x1B[0m)"
-                << expected_capacity << std::endl;
+                << " TO \x1B[30m" << expected_capacity << "\x1B[0m"
+                << std::endl;
     } else {
       if (debugout) {
-        std::cout << "FAILED TO RESIZE FROM " << old_capacity << " TO (\x1B[30m"
-                  << Map.capacity() << "\x1B[0m)" << expected_capacity
-                  << std::endl;
+        std::cout << "FAILED TO RESIZE FROM " << old_capacity << " TO \x1B[30m"
+                  << expected_capacity << "\x1B[0m" << std::endl;
       }
     }
     return test_success;
@@ -314,11 +327,15 @@ template <class Key, class Value> class AssociativeArrayUnitTest {
     std::cout << std::endl;
     std::cout << "SIZE:     " << Array.size() << std::endl
               << "CAPACITY: " << Array.capacity() << std::endl;
-    //!    std::cout << Array << std::endl;
+    std::cout << Array << std::endl;
     std::cout << std::endl;
     assert(test_resize(Array, true, true)); // resize to smaller
     // assert(test_isfull(Array, Keys, Values, true));
-    assert(test_remove(Array, true));
+    Key chosen_key = choose_random(Keys);
+    do {
+      assert(test_remove(Array, chosen_key, true));
+      chosen_key = choose_random(Keys);
+    } while (!Array.key_exists(chosen_key));
   }
 
 public:
@@ -432,7 +449,6 @@ int main() {
   using namespace HASHMAP;
 
   for (size_t i = 0; i < TESTCASES; i++) {
-    break;
     LINKEDLIST::Linked_List<std::string> Fruits = GenerateRandomStringList(10);
     LinkedListUnitTest<std::string> mystringstests(Fruits, i);
   }

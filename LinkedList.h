@@ -33,6 +33,13 @@ public:
 
 private:
   // PRIVATE HELPER FUNCTIONS
+
+  // Re-indexes the nodes in the list.
+  //
+  // Pre-condition: None
+  //
+  // Post-condition: All nodes in the list have been re-indexed in order from 0
+  // to size() - 1.
   void reindex() {
     Node *current = head;
     size_t index = 0;
@@ -42,14 +49,35 @@ private:
       index += 1;
     }
   }
-  // index is only valid if index >= 0 && index < size()
+  // Checks if the given index is valid.
+  //
+  // Pre-condition: None
+  //
+  // Post-condition: Returns true if the index is valid (i.e., it is greater
+  // than or equal to 0 and less than the current size of the list), and false
+  // otherwise.
   bool isindexvalid(size_t index) const {
+    // index is only valid if index >= 0 && index < size()
     return index >= 0 && index < current_size;
   }
 
+  // Checks if the given index is invalid.
+  //
+  // Pre-condition: None
+  //
+  // Post-condition: Returns true if the index is invalid (i.e., it is less than
+  // 0 or greater than or equal to the current size of the list), and false
+  // otherwise.
   bool isinvalidindex(const size_t index) const {
     return index < 0 && index >= current_size;
   }
+
+  // Gets the last node in the list.
+  //
+  // Pre-condition: None
+  //
+  // Post-condition: Returns a pointer to the last node in the list. If the list
+  // is empty, returns a pointer to the head of the list.
   Node *get_endpoint() {
     if (isempty()) {
       return head;
@@ -64,8 +92,19 @@ private:
 public:
   // CONST MEMBER FUNCTIONS
 
+  // Gets the value at the given index.
+  //
+  // Pre-condition: The given index is valid.
+  //
+  // Post-condition: Returns the value at the given index.
   const Data &at(const size_t index) const { return get_node(index)->value; }
 
+  // Gets the node at the given index.
+  //
+  // Pre-condition: The given index is valid.
+  //
+  // Post-condition: Returns a pointer to the node at the given index. If the
+  // index is invalid, returns nullptr.
   Node *get_node(size_t index) const {
     if (isinvalidindex(index)) {
       return nullptr;
@@ -88,9 +127,26 @@ public:
       return current;
     }
   }
+  // Gets the current size of the list.
+  //
+  // Pre-condition: None
+  //
+  // Post-condition: Returns the current size of the list.
   size_t size() const { return static_cast<size_t>(current_size); }
+
+  // Checks if the list is empty.
+  //
+  // Pre-condition: None
+  //
+  // Post-condition: Returns true if the list is empty, and false otherwise.
   bool isempty() const { return current_size == 0; }
 
+  // Checks if the given value is in the list.
+  //
+  // Pre-condition: None
+  //
+  // Post-condition: Returns true if the given value is in the list, and false
+  // otherwise.
   bool in(const Data value) const {
     if (isempty()) {
       return false;
@@ -106,6 +162,11 @@ public:
   }
   // MUTATOR MEMBER FUNCTIONS
 
+  // Reverses the order of the nodes in the list.
+  //
+  // Pre-condition: None
+  //
+  // Post-condition: The order of the nodes in the list has been reversed.
   void reverse() {
     size_t n = size();
     if (n > 1) {
@@ -115,7 +176,13 @@ public:
     }
   }
 
-  void insert(Data value, size_t index) {
+  // Inserts a new node with the given value at the given index.
+  //
+  // Pre-condition: The given index is valid.
+  //
+  // Post-condition: A new node with the given value has been inserted at the
+  // given index. If the index is invalid, no node is inserted.
+  void insert(Data value, const size_t index) {
     if (isempty() && index == 0) {
       head = new Node(value, 0);
       current_size += 1;
@@ -137,6 +204,12 @@ public:
     current_size += 1;
   }
 
+  // Inserts a new node with the given value at the end of the list.
+  //
+  // Pre-condition: None
+  //
+  // Post-condition: A new node with the given value has been inserted at the
+  // end of the list.
   void insert(Data value) {
     if (isempty()) {
       head = new Node(value, 0);
@@ -148,7 +221,13 @@ public:
     current_size += 1;
   }
 
-  void remove(size_t index = 0) {
+  // Removes the node at the given index.
+  //
+  // Pre-condition: The given index is valid.
+  //
+  // Post-condition: The node at the given index has been removed. If the index
+  // is invalid, no node is removed.
+  void remove(const size_t index = 0) {
     // there are 3 cases
     if (isempty()) {
       return;
@@ -191,7 +270,13 @@ public:
     }
   }
 
-  void swap(size_t left_index, size_t right_index) {
+  // Swaps the values of the nodes at the given indices.
+  //
+  // Pre-condition: The given indices are valid.
+  //
+  // Post-condition: The values of the nodes at the given indices have been
+  // swapped. If either index is invalid, no values are swapped.
+  void swap(const size_t left_index, const size_t right_index) {
     if (isinvalidindex(left_index) || isinvalidindex(right_index)) {
       return;
     }
@@ -201,6 +286,11 @@ public:
     right_node->value = temp_value;
   }
 
+  // Removes all nodes from the list.
+  //
+  // Pre-condition: None
+  //
+  // Post-condition: All nodes have been removed from the list.
   void clear() {
     // const size_t sizecopy = current_size;
     if (isempty()) {
@@ -213,11 +303,23 @@ public:
 
   // OVERLOAD OPERATORS
 
-  Data &operator[](size_t index) { return get_node(index)->value; }
+  // Accesses the value at the given index.
+  //
+  // Pre-condition: The given index is valid.
+  //
+  // Post-condition: Returns a reference to the value at the given index. If the
+  // index is invalid, the behavior is undefined.
+  Data &operator[](const size_t index) { return get_node(index)->value; }
 
-  template <class Data>
-  LINKEDLIST::Linked_List<Data> &
-  operator=(const LINKEDLIST::Linked_List<Data> &Source) {
+  typedef LINKEDLIST::Linked_List<Data> List;
+  // Assigns the values from the source list to the current list.
+  //
+  // Pre-condition: None
+  //
+  // Post-condition: The current list has been cleared and then filled with
+  // the values from the source list. Returns a reference to the current
+  // list.
+  List &operator=(const List &Source) {
     clear(); // Clear the list instance
     for (int i = 0; i < Source.size(); i++) {
       insert(Source[i]); // Insert elements from Source2 into the current list
@@ -225,8 +327,14 @@ public:
     return *this; // Return the current list
   }
 
-  typedef Linked_List<datatype_T> Array;
-  friend std::ostream &operator<<(std::ostream &os, const Array &list) {
+  // Prints the list to the given output stream.
+  //
+  // Pre-condition: None
+  //
+  // Post-condition: The values in the list have been printed to the given
+  // output stream in the format "[value1, value2, ...]". Returns the output
+  // stream.
+  friend std::ostream &operator<<(std::ostream &os, const List &list) {
     os << '[';
     Node *current = list.head;
     while (current) {
@@ -241,37 +349,46 @@ public:
     return os;
   }
 
+  // Concatenates the given list to the current list and returns the current
+  // list.
+  //
+  // Pre-condition: None
+  //
+  // Post-condition: The elements of the given list have been inserted at the
+  // end of the current list. The current list is returned. The given list is
+  // not modified.
+  List operator+(const List &Right) {
+    for (size_t index = 0; index < Right.size(); index++) {
+      insert(Right[index]);
+    }
+    return *this;
+  }
+
+  // Appends the elements of the given list to the current list and returns the
+  // current list.
+  //
+  // Pre-condition: None
+  //
+  // Post-condition: The elements of the given list have been inserted at the
+  // end of the current list. The current list is returned. The given list is
+  // not modified.
+  List operator+=(List &Right) {
+    // append values of list
+    for (size_t index = 0; index < Right.size(); index++) {
+      insert(Right[index]);
+    }
+    return *this;
+  }
   ~Linked_List() { clear(); }
 };
 
-template <class Data> Linked_List<Data> Copy(Linked_List<Data> &Source) {
+template <class Data> Linked_List<Data> Copy(const Linked_List<Data> &Source) {
   Linked_List<Data> Copied;
   size_t n = Source.size();
   for (size_t index = 0; index < n; index++) {
     Copied.insert(Source.get_node(index)->value);
   }
   return Copied;
-}
-
-template <class Data>
-Linked_List<Data> operator+(Linked_List<Data> &Left, Linked_List<Data> &Right) {
-  Linked_List<Data> Array;
-  for (size_t index = 0; index < Left.size(); index++) {
-    Array.insert(Left[index]);
-  }
-  for (size_t index = 0; index < Right.size(); index++) {
-    Array.insert(Right[index]);
-  }
-  return Array;
-}
-
-template <class Data>
-Linked_List<Data> operator+=(Linked_List<Data> &Left,
-                             Linked_List<Data> &Right) {
-  for (size_t index = 0; index < Right.size(); index++) {
-    Left.insert(Right[index]);
-  }
-  return Left;
 }
 
 } // namespace LINKEDLIST
@@ -324,8 +441,7 @@ private:
       }
       return true;
     }
-    ~Pair() {
-    }
+    ~Pair() {}
   };
 
   typedef Pair<Key, Value> MapElement;
@@ -335,8 +451,10 @@ private:
 
 public:
   static const size_t DEFAULT_CAPACITY = 0;
-  explicit AssociativeArray(size_t inital_size = DEFAULT_CAPACITY)
-      : Table(Map()) {
+  const size_t MAX_SIZE;
+  explicit AssociativeArray(size_t inital_size = DEFAULT_CAPACITY,
+                            size_t max_size = 50)
+      : Table(Map()), MAX_SIZE(max_size) {
     for (Index i = 0; i < inital_size; i++) {
       Table.insert(MapElement());
     }
@@ -410,6 +528,16 @@ public:
     return false;
   }
 
+  Value lookup(const Key key) const { // todo implement
+    if (isempty()) {
+      return;
+    }
+    if (!key_exists(key)) {
+      return;
+    }
+    std::cout << "NOT IMPLEMENTED" << std::endl;
+  }
+
   // Checks if the table is empty
   //
   // Pre-condition: None
@@ -434,31 +562,132 @@ public:
   //
   // Post-condition: The table's capacity is changed to newcapacity
   void resize(const size_t newcapacity) { // DEBUG THIS, FOR TEST
-    if (newcapacity == capacity()) { return;}
+    if (newcapacity == capacity()) {
+      return;
+    }
     size_t current_table_size = Table.size();
     const bool INCREASESIZE = newcapacity < current_table_size;
     if (INCREASESIZE) {
       // if newcapacity is less than current, remove until capacity reached
-      for (Index i = current_table_size; i > newcapacity; i--) {
+      for (Index i = current_table_size - 1; i > newcapacity; i--) {
         // prioritze removing empty keys
-        if (!Table.at(i).key) {
+        if (!Table.at(i).key) { //! seg fault
           Table.remove(i);
         }
       }
       // if desired capacity hasn't been reached, remove last value
       if (newcapacity < Table.size()) {
         for (Index i = Table.size(); i > newcapacity; i--) {
-          Table.remove(Table.size()-1);
+          Table.remove(Table.size() - 1);
         }
       }
     } else {
       // if newcapacity is greater than current, insert blank pair
       for (Index i = current_table_size; i < newcapacity; i++) {
-        // Table.insert(MapElement());
-        Table.insert(MapElement(),Table.size()-1);
+        //! seg fault with last index
+        Table.insert(MapElement());
       }
     }
   }
+
+  void shrink_to_fit() { // todo implement & test
+    // resize out any empty values, asssuming not empty the intended effect is
+    // for it to be full
+    for (Index i = 0; i < 0; i++) {
+      if (Table.at(i).empty_keyvalue()) {
+        Table.remove(i);
+      }
+    }
+  }
+
+  void keyValuePairs() { // todo implement
+                         // iterate through all the key value pairs
+    // for (Map.Entry<String, String> entry : map.entrySet()) {
+    //   String key = entry.getKey();
+    //   String value = entry.getValue();
+    //   System.out.println(key + ": " + value);
+    // }
+    std::cout << "NOT IMPLEMENTED" << std::endl;
+  }
+
+private:
+  void MergeSort(Map &Arr) {
+    // IMPLEMENT FOR BINARY SEARCH LOOKUPS
+    // Table sort based on stored value
+    // if len (arr) > 1 : mid = len(arr) // 2
+    //       left = arr[:mid] right = arr [mid:]
+    //
+    // # Recursively sort the left and right halves
+    // merge_sort(left) merge_sort(right)
+    //
+    // # Merge the sorted halves
+    // i = j = k = 0
+    // while i < len(left) and j < len(right)
+    //   if left[i][1] <= right[j][1]
+    //     arr[k] = left[i]
+    //     i += 1
+    //   else
+    //     arr[k] = right[j]
+    //     j += 1
+    //   k += 1
+    //
+    // #Copy any remaining elements from left and right
+    // while i < len(left)
+    //   arr[k] = left[i]
+    //   i += 1
+    //   k += 1
+    // while j < len(right)
+    //   arr[k] = right[j]
+    //   j += 1
+    //   k += 1
+
+    if (Arr.size() > 1) {
+      Index mid = Arr.size() / 2;
+      Map leftArr, // lower array
+          rightArr;  // upper array
+      for (Index i = 0; i < mid; i++) {
+        leftArr.insert(Arr.at(i));
+      }
+      for (Index i = mid; i < Arr.size(); i++) {
+        rightArr.insert(Arr.at(i));
+      }
+      // Recursively sort the left and right halves
+      MergeSort(leftArr);
+      MergeSort(rightArr);
+      Index i = 0, j = 0, k = 0;
+      // Merge the sorted halves
+      while (i < leftArr.size() && j < rightArr.size()) {
+        if (leftArr.at(i).Bucket <= rightArr.at(i).Bucket) {
+          Arr[k] = leftArr[i];
+          i += 1;
+        } else {
+          Arr[k] = rightArr[j];
+          j += 1;
+        }
+        k += 1;
+      }
+      // Copy any remaining elements from left and right
+      while (i < leftArr.size()) {
+        Arr[k] = leftArr[i];
+        i += 1;
+        k += 1;
+      }
+      while (j < rightArr.size()) {
+        Arr[k] = rightArr[j];
+        j += 1;
+        k += 1;
+      }
+    }
+    std::cout << "NOT IMPLEMENTED" << std::endl;
+  } // todo implement
+
+public:
+  friend AssociativeArray<Key, Value> Copy() { // todo implement
+    // return a shallow copy of the instance
+    AssociativeArray<Key, Value> Array;
+    return Array;
+  }
+
   // Inserts a new key-value pair into the table
   //
   // Pre-condition: The key is a valid Key type and the value is a valid Value
@@ -497,6 +726,9 @@ public:
       for (Index i = 0; i < current_size; i++) {
         if (Table.at(i).empty_keyvalue()) {
           Table[i] = MapElement(new Key(key), new Value(value));
+          if (current_size > 5) {
+            MergeSort(Table);
+          }
           return;
         }
       }
@@ -505,6 +737,9 @@ public:
       for (Index i = current_size; i < 0; i++) {
         if (*Table.at(i).key == key) {
           *Table[i].key = key;
+          if (current_size > 5) { 
+          MergeSort(Table);
+          }
           return;
         }
       }
@@ -522,15 +757,15 @@ public:
       return;
     }
     // look for key
-    if (!key_exists(&key)) {
+    if (!key_exists(key)) {
       return;
     }
     // key is confirmed to exist, parse through array to locate its index
-    for (Index i = 0;i < capacity(); i++) {
-      if (*Table.at(i).key == &key) {
+    for (Index i = 0; i < capacity(); i++) {
+      if (*Table.at(i).key == key) {
         // empty out & replace
         Table.remove(i);
-        Table.insert(size()-1);
+        // Table.insert(0);
       }
     }
   }
@@ -539,8 +774,8 @@ public:
   //
   // type alias for an instance of the class
   typedef AssociativeArray<Key, Value> Array;
-  // Overloads the [] operator to access the value associated with a key in the
-  // associative array
+  // Overloads the [] operator to access the value associated with a key in
+  // the associative array
   //
   // Pre-condition: The key is a valid Key type
   //
@@ -557,22 +792,27 @@ public:
       }
     }
   }
-
-//!  Array &operator=(Array &Source) {
-//!    if (this != &Source) {
-//!      Table = Source.Table;
-//!    }
-//!    return *this;
-//!  }
-  Array operator+(const Array &other) const {
-    // Implement merging of associative arrays
+  Array &operator=(const Array &Source) {
+    Table.clear(); // Clear the Array instance
+    for (int i = 0; i < Source.size(); i++) {
+      Table.insert(Source.Table.at(
+          i)); // Insert elements from Source into the current list
+    }
+    return *this; // Return the current Array instance
   }
-
-  Array &operator+=(const MapElement &kv) {
-    // Implement insertion/update of key-value pair
+  Array operator+(const Array &left) const {
+    // Implement merging of associative arrays
+    this->Table += left.Table; //! not implemented
     return *this;
   }
-  
+
+  Array &operator+=(Array &Array) {
+    // Implement insertion/update of key-value pair
+    this->Table += Array.Table; // todo fix so that it does not allow
+                                // duplicates and empty keys:values
+    return *this;
+  }
+
   typedef std::ostream os;
   // Overloads the << operator to print the associative array
   //
@@ -684,7 +924,7 @@ public:
   //?    return false;
   //?  }
 
-  bool key_exists(const Key key) const { // todo implement
+  bool key_exists(const Key key) const {
     if (isempty()) {
       return false;
     }
