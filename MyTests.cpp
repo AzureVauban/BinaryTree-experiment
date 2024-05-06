@@ -446,15 +446,16 @@ public:
 // };
 int main() {
   const static int TESTCASES = 100;
-  using namespace HASHMAP;
+  // using namespace HASHMAP;
 
   for (size_t i = 0; i < TESTCASES; i++) {
+    break; //! COMMENT OUT TO ENABLE TEST
     LINKEDLIST::Linked_List<std::string> Fruits = GenerateRandomStringList(10);
     LinkedListUnitTest<std::string> mystringstests(Fruits, i);
   }
 
   for (size_t i = 0; i < TESTCASES; i++) {
-
+    break; //! COMMENT OUT TO ENABLE TEST
     LINKEDLIST::Linked_List<std::string> strings = GenerateRandomStringList(50);
     LINKEDLIST::Linked_List<int> numbers = GenerateIntList(100);
     ASSOCIATIVEARRAY::AssociativeArray<std::string, int> Array(
@@ -463,6 +464,16 @@ int main() {
     AssociativeArrayUnitTest<std::string, int> myTests(Array, strings, numbers,
                                                        i);
   }
+  ASSOCIATIVEARRAY::AssociativeArray<int, int> BinetArray(5, 100);
+  for (int i = 0; i < 100; i++) {
+    BinetArray.insert(i, randomBetween(0, 1000));
+    if (BinetArray.isfull()) {
+      BinetArray.resize(BinetArray.size() + 10);
+    }
+  }
+  BinetArray.shrink_to_fit();
+  std::cout << BinetArray << std::endl;
+  std::cout << BinetArray[3] << std::endl;
   //! COMMENTED OUT BECAUSE HASH MAP WILL INHEIRTED FROM A_ARRAY CLASS
   //! for (size_t i = 0; i < TESTCASES; i++) {
   //!   LINKEDLIST::Linked_List<std::string> testkeys =

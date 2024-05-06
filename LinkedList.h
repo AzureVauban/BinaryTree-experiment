@@ -529,6 +529,7 @@ public:
   }
 
   Value lookup(const Key key) const { // todo implement
+    // const variant of the operatior[] function
     if (isempty()) {
       return;
     }
@@ -643,8 +644,8 @@ private:
 
     if (Arr.size() > 1) {
       Index mid = Arr.size() / 2;
-      Map leftArr, // lower array
-          rightArr;  // upper array
+      Map leftArr,  // lower array
+          rightArr; // upper array
       for (Index i = 0; i < mid; i++) {
         leftArr.insert(Arr.at(i));
       }
@@ -682,11 +683,11 @@ private:
   } // todo implement
 
 public:
-  friend AssociativeArray<Key, Value> Copy() { // todo implement
-    // return a shallow copy of the instance
-    AssociativeArray<Key, Value> Array;
-    return Array;
-  }
+  // friend AssociativeArray<Key, Value> Copy() { // todo implement
+  //   // return a shallow copy of the instance
+  //   AssociativeArray<Key, Value> Array;
+  //   return Array;
+  // }
 
   // Inserts a new key-value pair into the table
   //
@@ -737,8 +738,8 @@ public:
       for (Index i = current_size; i < 0; i++) {
         if (*Table.at(i).key == key) {
           *Table[i].key = key;
-          if (current_size > 5) { 
-          MergeSort(Table);
+          if (current_size > 5) {
+            MergeSort(Table);
           }
           return;
         }
@@ -788,9 +789,10 @@ public:
     // parse through Map array to locate the key
     for (Index i = 0; i < Table.size(); i++) {
       if (*Table[i].key == key) {
-        return *Table[i].value;
+        return *Table[i].Bucket;
       }
     }
+    return Key();
   }
   Array &operator=(const Array &Source) {
     Table.clear(); // Clear the Array instance
@@ -840,217 +842,218 @@ public:
   }
 };
 } // namespace ASSOCIATIVEARRAY
-namespace HASHMAP {
-
-// complete binary tree of Buckets, each Bucket is a Linked List corresponding
-// to a key
-template <class DataType_A, class DataType_B>
-struct HashMap { // THINK VENDING MACHINE
-  typedef DataType_A Key;
-  typedef DataType_B Value;
-  typedef size_t Index;
-  static const size_t DEFAULT_CAPACITY = 10;
-  // DECLARATION: NAMESPACE::Hashmap<KEY_DATATYPE,VALUE_DATATYPE>VARNAME;
-  // STD::HashMap<studentID,studentname>StudentsDatabase;
-
-private:
-  template <class Key, class Value> struct Pair {
-    Key *key;
-    Value *Bucket;
-
-  public:
-    explicit Pair<Key, Value>(Key *key = nullptr, Value *v = nullptr)
-        : key(key), Bucket(v) {}
-
-    typedef Pair<Key, Value> P;
-    typedef std::ostream os;
-    friend os &operator<<(os &output, const P &pair) {
-      output << "{";
-      if (!pair.key) { // print key
-        output << "0x0";
-      } else {
-        output << *pair.key;
-      }
-      output << ":";
-      if (!pair.Bucket) { // print bucket
-        output << "0x0";
-      } else {
-        output << *pair.Bucket;
-      }
-      output << "}";
-      return output;
-    }
-    bool empty_bucket() const { return !Bucket; }
-    bool empty_key() const { return !key; }
-    bool empty_keyvalue() const { return empty_key() & empty_bucket(); }
-    bool iskey(Key _key) const {
-      if (empty_key()) {
-        return false;
-      }
-      return &_key == key;
-    }
-    bool const isvalue(Value v) {
-      if (!Bucket) {
-        return false;
-      }
-      return true;
-    }
-    ~Pair() {}
-  };
-
-  typedef Pair<Key, Value> MapElement;
-  typedef LINKEDLIST::Linked_List<MapElement> Map;
-  size_t current_capacity;
-  float load_factor;
-  Map AssociativeArray;
-
-public:
-  size_t current_size;
-  explicit HashMap<Key, Value>(size_t inital_capacity = DEFAULT_CAPACITY)
-      : AssociativeArray(Map()), load_factor(0),
-        current_capacity(inital_capacity), current_size(0) {
-    for (Index i = 0; i < inital_capacity; i++) {
-      AssociativeArray.insert(MapElement(nullptr, nullptr));
-    }
-  }
-
-  // CONST MEMBER FUNCTIONS
-  //?  bool value_exists(const Data &value) const {
-  //?    for (Index i = 0; i < AssociativeArray.size(); i++) {
-  //?      if (value == AssociativeArray[i].value) {
-  //?        return true;
-  //?      }
-  //?    }
-  //?    return false;
-  //?  }
-
-  bool key_exists(const Key key) const {
-    if (isempty()) {
-      return false;
-    }
-    for (Index i = 0; i < AssociativeArray.size(); i++) {
-      if (AssociativeArray.at(i).key) {
-        if (*AssociativeArray.at(i).key == key) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-  bool value_exists(const Value value) const {
-    if (isempty()) {
-      return false;
-    }
-    // parse through the Map's List
-    for (Index i = 0; i < AssociativeArray.size(); i++) {
-      if (AssociativeArray.at(i).Bucket) {
-        if (*AssociativeArray.at(i).Bucket == value) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-  bool isempty() const { return current_size == 0; }
-
-  bool full() { return false; }
-
-  void size() {
-    size_t counter = 0;
-    for (Index i = 0; i < AssociativeArray.size(); i++) {
-      MapElement stored_value = AssociativeArray[i];
-      // std::cout << stored_value << std::endl;
-      if (!stored_value.empty_keyvalue()) {
-        counter += 1;
-      }
-    }
-    current_size = counter;
-  }
-  Key get_key(const MapElement value) { Key(); }
-  MapElement get_value(const Key key) { return MapElement(); }
-
-private:
-  // HELPER FUNCTIONS
-
-  float calc_load_factor() { return 0.00; } // load factor = capacity / used
-  float max_load_factor() { return 1.00; }
-  Key Hash(Value value) const { return Key(); }
-  Key Rehash(Index index) { Key(); }
-
-public:
-  // MUTATOR MEMBER FUNCTIONS
-
-  void resize(size_t newcapacity) {}
-  void insert(const Key key, Value value) {
-    // k = KEY EXISTS, v = VALUE EXIST
-    // (k && v) // do nothing
-    // (k && !v) // overwrite value at key
-    // (!k && v) // do nothing
-    // (!k && !v) // do insert(k,v)
-    if (isempty()) {
-      // INSERT FIRST KEY,VALUE PAIR
-      AssociativeArray[0] = MapElement(new Key(key), new Value(value));
-      // AssociativeArray[0].key = key;
-      // AssociativeArray[0].Bucket = value;
-      current_size += 1;
-      return;
-    }
-    const bool kPresent = key_exists(key), vPresent = value_exists(value);
-    if (!kPresent && !vPresent) { // do insert (k,v)
-      // find the first empty spot in the Associative Array
-      //! MapElement me = AssociativeArray[0];
-      for (Index i = 0; i < current_size;
-           i++) { // todo debug this for insert test
-        if (AssociativeArray.at(i).empty_keyvalue()) {
-          AssociativeArray[i] = MapElement(new Key(key), new Value(value));
-          current_size += 1;
-          return;
-        }
-      }
-      // return;
-    }
-    if (kPresent && !vPresent) { // overwrite value at key
-      //! for (Index i = AssociativeArray.size(); i < 0; i++) {
-      //!   if (AssociativeArray.at(i)->key == key) {
-      //!     AssociativeArray[i]->value = value;
-      //!   }
-      return;
-    }
-    return;
-  }
-  void remove(const Key key) {}
-  void clear() {}
-
-  // OVERLOADED OPERATORS
-
-  // void operator=(Map &Source) {}
-  MapElement operator[](const Key key) {}
-
-  typedef std::ostream os;
-  friend os &operator<<(os &output, const HashMap<Key, Value> &Map) {
-
-    //   Pair<Key, Value>(Key &key, Value *v = nullptr) : key(key), Bucket(v) {}
-    output << "{";
-    for (Index i = 0; i < Map.AssociativeArray.size(); i++) {
-      if (i != Map.AssociativeArray.size() - 1) {
-        output << Map.AssociativeArray.at(i) << ",";
-      } else {
-        output << Map.AssociativeArray.at(i);
-      }
-    }
-
-    output << "}";
-    return output;
-    // WHY DOES PRINTING THE MAP CAUSE CODE HANGS ? ?
-    // IT WAS DUE TO THE FACT THAT THE OPERATION NEEDED TO RETURN CONST, BUT
-    // THE SUB OPERATIONS DID NOT RETURN CONST, aka (any derivative operations
-    // must also return in const)
-    //! do not declare any new variables, only use const functions
-  }
-
-  ~HashMap() {}
-  // Notes:
-  // SAME VALUE BUT NOT KEY, IF KEY EXISTS, CHANGE KEY THEN INSERT
-};
-} // namespace HASHMAP
+// namespace HASHMAP {
+//
+//// complete binary tree of Buckets, each Bucket is a Linked List corresponding
+//// to a key
+// template <class DataType_A, class DataType_B>
+// struct HashMap { // THINK VENDING MACHINE
+//   typedef DataType_A Key;
+//   typedef DataType_B Value;
+//   typedef size_t Index;
+//   static const size_t DEFAULT_CAPACITY = 10;
+//   // DECLARATION: NAMESPACE::Hashmap<KEY_DATATYPE,VALUE_DATATYPE>VARNAME;
+//   // STD::HashMap<studentID,studentname>StudentsDatabase;
+//
+// private:
+//   template <class Key, class Value> struct Pair {
+//     Key *key;
+//     Value *Bucket;
+//
+//   public:
+//     explicit Pair<Key, Value>(Key *key = nullptr, Value *v = nullptr)
+//         : key(key), Bucket(v) {}
+//
+//     typedef Pair<Key, Value> P;
+//     typedef std::ostream os;
+//     friend os &operator<<(os &output, const P &pair) {
+//       output << "{";
+//       if (!pair.key) { // print key
+//         output << "0x0";
+//       } else {
+//         output << *pair.key;
+//       }
+//       output << ":";
+//       if (!pair.Bucket) { // print bucket
+//         output << "0x0";
+//       } else {
+//         output << *pair.Bucket;
+//       }
+//       output << "}";
+//       return output;
+//     }
+//     bool empty_bucket() const { return !Bucket; }
+//     bool empty_key() const { return !key; }
+//     bool empty_keyvalue() const { return empty_key() & empty_bucket(); }
+//     bool iskey(Key _key) const {
+//       if (empty_key()) {
+//         return false;
+//       }
+//       return &_key == key;
+//     }
+//     bool const isvalue(Value v) {
+//       if (!Bucket) {
+//         return false;
+//       }
+//       return true;
+//     }
+//     ~Pair() {}
+//   };
+//
+//   typedef Pair<Key, Value> MapElement;
+//   typedef LINKEDLIST::Linked_List<MapElement> Map;
+//   size_t current_capacity;
+//   float load_factor;
+//   Map AssociativeArray;
+//
+// public:
+//   size_t current_size;
+//   explicit HashMap<Key, Value>(size_t inital_capacity = DEFAULT_CAPACITY)
+//       : AssociativeArray(Map()), load_factor(0),
+//         current_capacity(inital_capacity), current_size(0) {
+//     for (Index i = 0; i < inital_capacity; i++) {
+//       AssociativeArray.insert(MapElement(nullptr, nullptr));
+//     }
+//   }
+//
+//   // CONST MEMBER FUNCTIONS
+//   //?  bool value_exists(const Data &value) const {
+//   //?    for (Index i = 0; i < AssociativeArray.size(); i++) {
+//   //?      if (value == AssociativeArray[i].value) {
+//   //?        return true;
+//   //?      }
+//   //?    }
+//   //?    return false;
+//   //?  }
+//
+//   bool key_exists(const Key key) const {
+//     if (isempty()) {
+//       return false;
+//     }
+//     for (Index i = 0; i < AssociativeArray.size(); i++) {
+//       if (AssociativeArray.at(i).key) {
+//         if (*AssociativeArray.at(i).key == key) {
+//           return true;
+//         }
+//       }
+//     }
+//     return false;
+//   }
+//   bool value_exists(const Value value) const {
+//     if (isempty()) {
+//       return false;
+//     }
+//     // parse through the Map's List
+//     for (Index i = 0; i < AssociativeArray.size(); i++) {
+//       if (AssociativeArray.at(i).Bucket) {
+//         if (*AssociativeArray.at(i).Bucket == value) {
+//           return true;
+//         }
+//       }
+//     }
+//     return false;
+//   }
+//   bool isempty() const { return current_size == 0; }
+//
+//   bool full() { return false; }
+//
+//   void size() {
+//     size_t counter = 0;
+//     for (Index i = 0; i < AssociativeArray.size(); i++) {
+//       MapElement stored_value = AssociativeArray[i];
+//       // std::cout << stored_value << std::endl;
+//       if (!stored_value.empty_keyvalue()) {
+//         counter += 1;
+//       }
+//     }
+//     current_size = counter;
+//   }
+//   Key get_key(const MapElement value) { Key(); }
+//   MapElement get_value(const Key key) { return MapElement(); }
+//
+// private:
+//   // HELPER FUNCTIONS
+//
+//   float calc_load_factor() { return 0.00; } // load factor = capacity / used
+//   float max_load_factor() { return 1.00; }
+//   Key Hash(Value value) const { return Key(); }
+//   Key Rehash(Index index) { Key(); }
+//
+// public:
+//   // MUTATOR MEMBER FUNCTIONS
+//
+//   void resize(size_t newcapacity) {}
+//   void insert(const Key key, Value value) {
+//     // k = KEY EXISTS, v = VALUE EXIST
+//     // (k && v) // do nothing
+//     // (k && !v) // overwrite value at key
+//     // (!k && v) // do nothing
+//     // (!k && !v) // do insert(k,v)
+//     if (isempty()) {
+//       // INSERT FIRST KEY,VALUE PAIR
+//       AssociativeArray[0] = MapElement(new Key(key), new Value(value));
+//       // AssociativeArray[0].key = key;
+//       // AssociativeArray[0].Bucket = value;
+//       current_size += 1;
+//       return;
+//     }
+//     const bool kPresent = key_exists(key), vPresent = value_exists(value);
+//     if (!kPresent && !vPresent) { // do insert (k,v)
+//       // find the first empty spot in the Associative Array
+//       //! MapElement me = AssociativeArray[0];
+//       for (Index i = 0; i < current_size;
+//            i++) { // todo debug this for insert test
+//         if (AssociativeArray.at(i).empty_keyvalue()) {
+//           AssociativeArray[i] = MapElement(new Key(key), new Value(value));
+//           current_size += 1;
+//           return;
+//         }
+//       }
+//       // return;
+//     }
+//     if (kPresent && !vPresent) { // overwrite value at key
+//       //! for (Index i = AssociativeArray.size(); i < 0; i++) {
+//       //!   if (AssociativeArray.at(i)->key == key) {
+//       //!     AssociativeArray[i]->value = value;
+//       //!   }
+//       return;
+//     }
+//     return;
+//   }
+//   void remove(const Key key) {}
+//   void clear() {}
+//
+//   // OVERLOADED OPERATORS
+//
+//   // void operator=(Map &Source) {}
+//   MapElement operator[](const Key key) {}
+//
+//   typedef std::ostream os;
+//   friend os &operator<<(os &output, const HashMap<Key, Value> &Map) {
+//
+//     //   Pair<Key, Value>(Key &key, Value *v = nullptr) : key(key), Bucket(v)
+//     {} output << "{"; for (Index i = 0; i < Map.AssociativeArray.size(); i++)
+//     {
+//       if (i != Map.AssociativeArray.size() - 1) {
+//         output << Map.AssociativeArray.at(i) << ",";
+//       } else {
+//         output << Map.AssociativeArray.at(i);
+//       }
+//     }
+//
+//     output << "}";
+//     return output;
+//     // WHY DOES PRINTING THE MAP CAUSE CODE HANGS ? ?
+//     // IT WAS DUE TO THE FACT THAT THE OPERATION NEEDED TO RETURN CONST, BUT
+//     // THE SUB OPERATIONS DID NOT RETURN CONST, aka (any derivative
+//     operations
+//     // must also return in const)
+//     //! do not declare any new variables, only use const functions
+//   }
+//
+//   ~HashMap() {}
+//   // Notes:
+//   // SAME VALUE BUT NOT KEY, IF KEY EXISTS, CHANGE KEY THEN INSERT
+// };
+// } // namespace HASHMAP
 #endif // LINKED_LIST_H
