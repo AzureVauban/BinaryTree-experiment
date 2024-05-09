@@ -3,12 +3,8 @@
 
 #include <cstddef>
 #include <cstdio>
-#include <functional>
 #include <iostream>
 #include <istream>
-#include <iterator>
-#include <ostream>
-#include <utility>
 namespace LINKEDLIST {
 
 template <class datatype_K> struct LinkedListNode {
@@ -21,6 +17,7 @@ template <class datatype_K> struct LinkedListNode {
   ~LinkedListNode() { // DELETION IS HANDLED BY THE LINKED LIST WRAPPER CLASS
   }
 };
+
 template <class datatype_T> struct Linked_List {
 private:
   typedef datatype_T Data;
@@ -48,17 +45,6 @@ private:
       current = current->next;
       index += 1;
     }
-  }
-  // Checks if the given index is valid.
-  //
-  // Pre-condition: None
-  //
-  // Post-condition: Returns true if the index is valid (i.e., it is greater
-  // than or equal to 0 and less than the current size of the list), and false
-  // otherwise.
-  bool isindexvalid(size_t index) const {
-    // index is only valid if index >= 0 && index < size()
-    return index >= 0 && index < current_size;
   }
 
   // Checks if the given index is invalid.
@@ -380,7 +366,8 @@ public:
     return *this;
   }
   ~Linked_List() { clear(); }
-};
+}; //! on final free response, make sure to practice printing a singly-linked
+   //! list backwards using recurison
 
 template <class Data> Linked_List<Data> Copy(const Linked_List<Data> &Source) {
   Linked_List<Data> Copied;
@@ -392,8 +379,28 @@ template <class Data> Linked_List<Data> Copy(const Linked_List<Data> &Source) {
 }
 
 } // namespace LINKEDLIST
-namespace ASSOCIATIVEARRAY {
 
+namespace ASSOCIATIVEARRAY {
+/**
+ * @brief Associative Array Class Invariant
+ *
+ * The AssociativeArray class template creates a data structure that maps keys
+ * of type DataType_A to values of type DataType_B. It is designed to allow
+ * efficient key-value association and retrieval.
+ *
+ * Class Invariant:
+ * 1. Each key in the AssociativeArray is unique; no two keys are the same.
+ * 2. The DataType_B must be a comparable type to enable sorting based on
+ * values. This means that DataType_B should implement or support comparison
+ * operators such as <, >, ==, etc.
+ *
+ * Note:
+ * For sorting operations that involve values of DataType_B, it is imperative
+ * that the DataType_B class is comparable. This is necessary to ensure that the
+ * values can be ordered and sorted correctly. If DataType_B lacks comparison
+ * operators, the AssociativeArray will not be able to perform sorting
+ * operations involving DataType_B values.
+ */
 template <class DataType_A, class DataType_B> struct AssociativeArray {
   typedef DataType_A Key;
   typedef DataType_B Value;
@@ -402,11 +409,11 @@ template <class DataType_A, class DataType_B> struct AssociativeArray {
 private:
   template <class Key, class Value> struct Pair {
     Key *key;
-    Value *Bucket;
+    Value *value;
 
   public:
     explicit Pair<Key, Value>(Key *key = nullptr, Value *v = nullptr)
-        : key(key), Bucket(v) {}
+        : key(key), value(v) {}
 
     typedef Pair<Key, Value> P;
     typedef std::ostream os;
@@ -418,15 +425,15 @@ private:
         output << *pair.key;
       }
       output << ":";
-      if (!pair.Bucket) { // print bucket
+      if (!pair.value) { // print bucket
         output << "0x0";
       } else {
-        output << *pair.Bucket;
+        output << *pair.value;
       }
       output << "}";
       return output;
     }
-    bool empty_bucket() const { return !Bucket; }
+    bool empty_bucket() const { return !value; }
     bool empty_key() const { return !key; }
     bool empty_keyvalue() const { return empty_key() & empty_bucket(); }
     bool iskey(Key _key) const {
@@ -436,7 +443,7 @@ private:
       return &_key == key;
     }
     bool const isvalue(Value v) {
-      if (!Bucket) {
+      if (!value) {
         return false;
       }
       return true;
@@ -450,23 +457,35 @@ private:
   Map Table;
 
 public:
-  static const size_t DEFAULT_CAPACITY = 0;
-  const size_t MAX_SIZE;
-  explicit AssociativeArray(size_t inital_size = DEFAULT_CAPACITY,
-                            size_t max_size = 50)
-      : Table(Map()), MAX_SIZE(max_size) {
-    for (Index i = 0; i < inital_size; i++) {
+  static const size_t DEFAULT_CAPACITY = 10;
+  explicit AssociativeArray(const size_t inital_capacity = DEFAULT_CAPACITY)
+      : Table(Map()) {
+    for (Index i = 0; i < inital_capacity; i++) {
       Table.insert(MapElement());
     }
   }
+  // typedef LINKEDLIST::Linked_List<Key> Keys;
+  // typedef LINKEDLIST::Linked_List<Value> Values;
+
+  // explicit AssociativeArray(const size_t inital_capacity,
+  //                           Keys &__keys = Keys(),
+  //                           const Values &__value = Value()) {
+  //   Table.clear();
+  //   size_t k = __keys.size(), v = __value.size();
+  //   size_t size = (k < v) ? k : v;
+  //   for (Index i = 0; i < size; i++) {
+  //     Table.insert(MapElement(__keys.at(i), __value.at(i)));
+  //   }
+  // }
+
   // CONST MEMBER FUNCTIONS
 
   // current number of key-value pairs
   //
   // Pre-condition: None
   //
-  // Post-condition: Returns the current number of key-value pairs in the table,
-  // which is the count of all pairs, exlcuding non-null pairs.
+  // Post-condition: Returns the current number of key-value pairs in the
+  // table, which is the count of all pairs, exlcuding non-null pairs.
   size_t size() const {
     // return how many non-empty pairs are in the list
     size_t counter = 0;
@@ -519,8 +538,8 @@ public:
     }
     // parse through the Map's List
     for (Index i = 0; i < Table.size(); i++) {
-      if (Table.at(i).Bucket) {
-        if (*Table.at(i).Bucket == value) {
+      if (Table.at(i).value) {
+        if (*Table.at(i).value == value) {
           return true;
         }
       }
@@ -528,15 +547,26 @@ public:
     return false;
   }
 
-  Value lookup(const Key key) const { // todo implement
+  // Retrieves the value associated with the given key.
+  //
+  // Pre-condition: The key must exist in the associative array.
+  //
+  // Post-condition: Returns the value associated with the key if it exists.
+  // If the key does not exist, behavior is undefined.
+  Value lookup(const Key key) const {
     // const variant of the operatior[] function
     if (isempty()) {
-      return;
+      return Value();
     }
     if (!key_exists(key)) {
-      return;
+      return Value();
     }
-    std::cout << "NOT IMPLEMENTED" << std::endl;
+    for (Index i = 0; i < Table.size(); i++) {
+      if (*Table.at(i).key == key) {
+        return *Table.at(i).value;
+      }
+    }
+    return Value();
   }
 
   // Checks if the table is empty
@@ -567,13 +597,16 @@ public:
       return;
     }
     size_t current_table_size = Table.size();
-    const bool INCREASESIZE = newcapacity < current_table_size;
-    if (INCREASESIZE) {
+    // const bool INCREASESIZE = ;
+    if (newcapacity < current_table_size) {
       // if newcapacity is less than current, remove until capacity reached
       for (Index i = current_table_size - 1; i > newcapacity; i--) {
         // prioritze removing empty keys
-        if (!Table.at(i).key) { //! seg fault
+        if (!Table.at(i).key) {
           Table.remove(i);
+        }
+        if (size() >= 10) {
+          // MergeSort(Table);
         }
       }
       // if desired capacity hasn't been reached, remove last value
@@ -581,114 +614,57 @@ public:
         for (Index i = Table.size(); i > newcapacity; i--) {
           Table.remove(Table.size() - 1);
         }
+        if (size() >= 10) {
+          // MergeSort(Table);
+        }
       }
     } else {
       // if newcapacity is greater than current, insert blank pair
       for (Index i = current_table_size; i < newcapacity; i++) {
-        //! seg fault with last index
         Table.insert(MapElement());
       }
     }
   }
 
-  void shrink_to_fit() { // todo implement & test
+  // Reduces the capacity of the associative array to fit its size.
+  //
+  // Pre-condition: None
+  //
+  // Post-condition: The capacity of the associative array is reduced to
+  // match the current number of key-value pairs, potentially freeing memory.
+  void shrink_to_fit() {
     // resize out any empty values, asssuming not empty the intended effect is
     // for it to be full
-    for (Index i = 0; i < 0; i++) {
-      if (Table.at(i).empty_keyvalue()) {
-        Table.remove(i);
-      }
-    }
-  }
-
-  void keyValuePairs() { // todo implement
-                         // iterate through all the key value pairs
-    // for (Map.Entry<String, String> entry : map.entrySet()) {
-    //   String key = entry.getKey();
-    //   String value = entry.getValue();
-    //   System.out.println(key + ": " + value);
-    // }
-    std::cout << "NOT IMPLEMENTED" << std::endl;
-  }
-
-private:
-  void MergeSort(Map &Arr) {
-    // IMPLEMENT FOR BINARY SEARCH LOOKUPS
-    // Table sort based on stored value
-    // if len (arr) > 1 : mid = len(arr) // 2
-    //       left = arr[:mid] right = arr [mid:]
-    //
-    // # Recursively sort the left and right halves
-    // merge_sort(left) merge_sort(right)
-    //
-    // # Merge the sorted halves
-    // i = j = k = 0
-    // while i < len(left) and j < len(right)
-    //   if left[i][1] <= right[j][1]
-    //     arr[k] = left[i]
-    //     i += 1
-    //   else
-    //     arr[k] = right[j]
-    //     j += 1
-    //   k += 1
-    //
-    // #Copy any remaining elements from left and right
-    // while i < len(left)
-    //   arr[k] = left[i]
-    //   i += 1
-    //   k += 1
-    // while j < len(right)
-    //   arr[k] = right[j]
-    //   j += 1
-    //   k += 1
-
-    if (Arr.size() > 1) {
-      Index mid = Arr.size() / 2;
-      Map leftArr,  // lower array
-          rightArr; // upper array
-      for (Index i = 0; i < mid; i++) {
-        leftArr.insert(Arr.at(i));
-      }
-      for (Index i = mid; i < Arr.size(); i++) {
-        rightArr.insert(Arr.at(i));
-      }
-      // Recursively sort the left and right halves
-      MergeSort(leftArr);
-      MergeSort(rightArr);
-      Index i = 0, j = 0, k = 0;
-      // Merge the sorted halves
-      while (i < leftArr.size() && j < rightArr.size()) {
-        if (leftArr.at(i).Bucket <= rightArr.at(i).Bucket) {
-          Arr[k] = leftArr[i];
-          i += 1;
-        } else {
-          Arr[k] = rightArr[j];
-          j += 1;
+    while (!isfull()) {
+      for (Index i = 0; i < capacity(); i++) {
+        if (Table.at(i).empty_keyvalue()) {
+          Table.remove(i);
+          // std::cout << Table << std::endl;
         }
-        k += 1;
-      }
-      // Copy any remaining elements from left and right
-      while (i < leftArr.size()) {
-        Arr[k] = leftArr[i];
-        i += 1;
-        k += 1;
-      }
-      while (j < rightArr.size()) {
-        Arr[k] = rightArr[j];
-        j += 1;
-        k += 1;
       }
     }
-    std::cout << "NOT IMPLEMENTED" << std::endl;
-  } // todo implement
+  }
+
+  void clear() { Table.clear(); }
+  typedef LINKEDLIST::Linked_List<Key> Keys;
+  // Retrieves a collection of all keys in the associative array.
+  //
+  // Pre-condition: None
+  //
+  // Post-condition: Returns a collection of keys. The order of keys
+  // is not guaranteed to be sorted.
+  Keys getKeys() const {
+    // iterate through all the key value pairs
+    Keys k;
+    for (Index i = 0; i < Table.size(); i++) {
+      if (!Table.at(i).empty_key()) {
+        k.insert(*Table.at(i).key);
+      }
+    }
+    return k;
+  }
 
 public:
-  // friend AssociativeArray<Key, Value> Copy() { // todo implement
-  //   // return a shallow copy of the instance
-  //   AssociativeArray<Key, Value> Array;
-  //   return Array;
-  // }
-
   // Inserts a new key-value pair into the table
   //
   // Pre-condition: The key is a valid Key type and the value is a valid Value
@@ -714,6 +690,7 @@ public:
       // AssociativeArray[0].Bucket = value;
       return;
     }
+
     if (isfull()) {
       const size_t newcapacity = 1 + (capacity() * 2.5);
       resize(newcapacity);
@@ -727,20 +704,14 @@ public:
       for (Index i = 0; i < current_size; i++) {
         if (Table.at(i).empty_keyvalue()) {
           Table[i] = MapElement(new Key(key), new Value(value));
-          if (current_size > 5) {
-            MergeSort(Table);
-          }
           return;
         }
       }
     }
-    if (kPresent && !vPresent) { // overwrite value at key
+    if (!kPresent && vPresent) { // overwrite value at key
       for (Index i = current_size; i < 0; i++) {
         if (*Table.at(i).key == key) {
           *Table[i].key = key;
-          if (current_size > 5) {
-            MergeSort(Table);
-          }
           return;
         }
       }
@@ -784,16 +755,25 @@ public:
   // otherwise returns a default-constructed Key object
   Value operator[](const Key key) {
     if (!key_exists(key)) {
-      return Key();
+      return Value();
     }
     // parse through Map array to locate the key
     for (Index i = 0; i < Table.size(); i++) {
       if (*Table[i].key == key) {
-        return *Table[i].Bucket;
+        return *Table[i].value;
       }
     }
-    return Key();
+    return Value();
   }
+
+  // Assigns the contents of the source associative array to this associative
+  // array.
+  //
+  // Pre-condition: None
+  //
+  // Post-condition: The current associative array contains a copy of all
+  // key-value pairs from the source array. The previous content of this
+  // associative array is replaced.
   Array &operator=(const Array &Source) {
     Table.clear(); // Clear the Array instance
     for (int i = 0; i < Source.size(); i++) {
@@ -801,18 +781,6 @@ public:
           i)); // Insert elements from Source into the current list
     }
     return *this; // Return the current Array instance
-  }
-  Array operator+(const Array &left) const {
-    // Implement merging of associative arrays
-    this->Table += left.Table; //! not implemented
-    return *this;
-  }
-
-  Array &operator+=(Array &Array) {
-    // Implement insertion/update of key-value pair
-    this->Table += Array.Table; // todo fix so that it does not allow
-                                // duplicates and empty keys:values
-    return *this;
   }
 
   typedef std::ostream os;
@@ -823,13 +791,13 @@ public:
   //
   // Post-condition: Prints the associative array to the output stream and
   // returns the stream
-  friend os &operator<<(os &output, const Array &Map) {
+  friend os &operator<<(os &output, const Array &Array) {
     output << "{";
-    for (Index i = 0; i < Map.Table.size(); i++) {
-      if (i != Map.Table.size() - 1) {
-        output << Map.Table.at(i) << ",";
+    for (Index i = 0; i < Array.Table.size(); i++) {
+      if (i != Array.Table.size() - 1) {
+        output << Array.Table.at(i) << ",";
       } else {
-        output << Map.Table.at(i);
+        output << Array.Table.at(i);
       }
     }
     output << "}";
@@ -842,218 +810,113 @@ public:
   }
 };
 } // namespace ASSOCIATIVEARRAY
-// namespace HASHMAP {
-//
-//// complete binary tree of Buckets, each Bucket is a Linked List corresponding
-//// to a key
-// template <class DataType_A, class DataType_B>
-// struct HashMap { // THINK VENDING MACHINE
-//   typedef DataType_A Key;
-//   typedef DataType_B Value;
-//   typedef size_t Index;
-//   static const size_t DEFAULT_CAPACITY = 10;
-//   // DECLARATION: NAMESPACE::Hashmap<KEY_DATATYPE,VALUE_DATATYPE>VARNAME;
-//   // STD::HashMap<studentID,studentname>StudentsDatabase;
-//
-// private:
-//   template <class Key, class Value> struct Pair {
-//     Key *key;
-//     Value *Bucket;
-//
-//   public:
-//     explicit Pair<Key, Value>(Key *key = nullptr, Value *v = nullptr)
-//         : key(key), Bucket(v) {}
-//
-//     typedef Pair<Key, Value> P;
-//     typedef std::ostream os;
-//     friend os &operator<<(os &output, const P &pair) {
-//       output << "{";
-//       if (!pair.key) { // print key
-//         output << "0x0";
-//       } else {
-//         output << *pair.key;
-//       }
-//       output << ":";
-//       if (!pair.Bucket) { // print bucket
-//         output << "0x0";
-//       } else {
-//         output << *pair.Bucket;
-//       }
-//       output << "}";
-//       return output;
-//     }
-//     bool empty_bucket() const { return !Bucket; }
-//     bool empty_key() const { return !key; }
-//     bool empty_keyvalue() const { return empty_key() & empty_bucket(); }
-//     bool iskey(Key _key) const {
-//       if (empty_key()) {
-//         return false;
-//       }
-//       return &_key == key;
-//     }
-//     bool const isvalue(Value v) {
-//       if (!Bucket) {
-//         return false;
-//       }
-//       return true;
-//     }
-//     ~Pair() {}
-//   };
-//
-//   typedef Pair<Key, Value> MapElement;
-//   typedef LINKEDLIST::Linked_List<MapElement> Map;
-//   size_t current_capacity;
-//   float load_factor;
-//   Map AssociativeArray;
-//
-// public:
-//   size_t current_size;
-//   explicit HashMap<Key, Value>(size_t inital_capacity = DEFAULT_CAPACITY)
-//       : AssociativeArray(Map()), load_factor(0),
-//         current_capacity(inital_capacity), current_size(0) {
-//     for (Index i = 0; i < inital_capacity; i++) {
-//       AssociativeArray.insert(MapElement(nullptr, nullptr));
-//     }
-//   }
-//
-//   // CONST MEMBER FUNCTIONS
-//   //?  bool value_exists(const Data &value) const {
-//   //?    for (Index i = 0; i < AssociativeArray.size(); i++) {
-//   //?      if (value == AssociativeArray[i].value) {
-//   //?        return true;
-//   //?      }
-//   //?    }
-//   //?    return false;
-//   //?  }
-//
-//   bool key_exists(const Key key) const {
-//     if (isempty()) {
-//       return false;
-//     }
-//     for (Index i = 0; i < AssociativeArray.size(); i++) {
-//       if (AssociativeArray.at(i).key) {
-//         if (*AssociativeArray.at(i).key == key) {
-//           return true;
-//         }
-//       }
-//     }
-//     return false;
-//   }
-//   bool value_exists(const Value value) const {
-//     if (isempty()) {
-//       return false;
-//     }
-//     // parse through the Map's List
-//     for (Index i = 0; i < AssociativeArray.size(); i++) {
-//       if (AssociativeArray.at(i).Bucket) {
-//         if (*AssociativeArray.at(i).Bucket == value) {
-//           return true;
-//         }
-//       }
-//     }
-//     return false;
-//   }
-//   bool isempty() const { return current_size == 0; }
-//
-//   bool full() { return false; }
-//
-//   void size() {
-//     size_t counter = 0;
-//     for (Index i = 0; i < AssociativeArray.size(); i++) {
-//       MapElement stored_value = AssociativeArray[i];
-//       // std::cout << stored_value << std::endl;
-//       if (!stored_value.empty_keyvalue()) {
-//         counter += 1;
-//       }
-//     }
-//     current_size = counter;
-//   }
-//   Key get_key(const MapElement value) { Key(); }
-//   MapElement get_value(const Key key) { return MapElement(); }
-//
-// private:
-//   // HELPER FUNCTIONS
-//
-//   float calc_load_factor() { return 0.00; } // load factor = capacity / used
-//   float max_load_factor() { return 1.00; }
-//   Key Hash(Value value) const { return Key(); }
-//   Key Rehash(Index index) { Key(); }
-//
-// public:
-//   // MUTATOR MEMBER FUNCTIONS
-//
-//   void resize(size_t newcapacity) {}
-//   void insert(const Key key, Value value) {
-//     // k = KEY EXISTS, v = VALUE EXIST
-//     // (k && v) // do nothing
-//     // (k && !v) // overwrite value at key
-//     // (!k && v) // do nothing
-//     // (!k && !v) // do insert(k,v)
-//     if (isempty()) {
-//       // INSERT FIRST KEY,VALUE PAIR
-//       AssociativeArray[0] = MapElement(new Key(key), new Value(value));
-//       // AssociativeArray[0].key = key;
-//       // AssociativeArray[0].Bucket = value;
-//       current_size += 1;
-//       return;
-//     }
-//     const bool kPresent = key_exists(key), vPresent = value_exists(value);
-//     if (!kPresent && !vPresent) { // do insert (k,v)
-//       // find the first empty spot in the Associative Array
-//       //! MapElement me = AssociativeArray[0];
-//       for (Index i = 0; i < current_size;
-//            i++) { // todo debug this for insert test
-//         if (AssociativeArray.at(i).empty_keyvalue()) {
-//           AssociativeArray[i] = MapElement(new Key(key), new Value(value));
-//           current_size += 1;
-//           return;
-//         }
-//       }
-//       // return;
-//     }
-//     if (kPresent && !vPresent) { // overwrite value at key
-//       //! for (Index i = AssociativeArray.size(); i < 0; i++) {
-//       //!   if (AssociativeArray.at(i)->key == key) {
-//       //!     AssociativeArray[i]->value = value;
-//       //!   }
-//       return;
-//     }
-//     return;
-//   }
-//   void remove(const Key key) {}
-//   void clear() {}
-//
-//   // OVERLOADED OPERATORS
-//
-//   // void operator=(Map &Source) {}
-//   MapElement operator[](const Key key) {}
-//
-//   typedef std::ostream os;
-//   friend os &operator<<(os &output, const HashMap<Key, Value> &Map) {
-//
-//     //   Pair<Key, Value>(Key &key, Value *v = nullptr) : key(key), Bucket(v)
-//     {} output << "{"; for (Index i = 0; i < Map.AssociativeArray.size(); i++)
-//     {
-//       if (i != Map.AssociativeArray.size() - 1) {
-//         output << Map.AssociativeArray.at(i) << ",";
-//       } else {
-//         output << Map.AssociativeArray.at(i);
-//       }
-//     }
-//
-//     output << "}";
-//     return output;
-//     // WHY DOES PRINTING THE MAP CAUSE CODE HANGS ? ?
-//     // IT WAS DUE TO THE FACT THAT THE OPERATION NEEDED TO RETURN CONST, BUT
-//     // THE SUB OPERATIONS DID NOT RETURN CONST, aka (any derivative
-//     operations
-//     // must also return in const)
-//     //! do not declare any new variables, only use const functions
-//   }
-//
-//   ~HashMap() {}
-//   // Notes:
-//   // SAME VALUE BUT NOT KEY, IF KEY EXISTS, CHANGE KEY THEN INSERT
-// };
-// } // namespace HASHMAP
+namespace CIRCULARLINKEDLIST {
+template <class datatype_T> struct CircularLinkedList {
+  typedef datatype_T Value;
+  typedef size_t Index;
+  typedef LINKEDLIST::LinkedListNode<Value> Node;
+  Node *head;
+  explicit CircularLinkedList() : head(nullptr) {}
+
+  /**
+   * @brief Checks if the circular linked list is empty.
+   *
+   * @pre None
+   * @post Returns true if the circular linked list is empty (i.e., it contains
+   * no elements), false otherwise.
+   */
+  bool isempty() const { return true; }
+
+  /**
+   * @brief Returns the number of elements in the circular linked list.
+   *
+   * @pre None
+   * @post Returns the current number of elements in the circular linked list.
+   */
+  size_t size() const { return 0; }
+
+  /**
+   * @brief Returns the capacity of the circular linked list.
+   *
+   * @pre None
+   * @post Returns the current capacity of the circular linked list.
+   */
+  size_t capacity() const { return 0; }
+
+private:
+  /**
+   * @brief Returns the pointer to the circular endpoint of the linked list.
+   *
+   * @pre None
+   * @post Returns the pointer to the circular endpoint of the linked list.
+   */
+  Node *get_circular_endpoint() { return nullptr; }
+
+public:
+  /**
+   * @brief Accesses the value at the specified index in the circular linked
+   * list.
+   *
+   * @pre The index is a valid index within the range of the circular linked
+   * list.
+   * @post Returns the value at the specified index in the circular linked list.
+   */
+  Value operator[](const Index index) { return Value(); }
+
+  /**
+   * @brief Returns the value at the specified index in the circular linked
+   * list.
+   *
+   * @pre The index is a valid index within the range of the circular linked
+   * list.
+   * @post Returns the value at the specified index in the circular linked list.
+   */
+  Value at(const Index index) const { return Value(); }
+
+  /**
+   * @brief Resizes the circular linked list.
+   *
+   * @pre None
+   * @post Resizes the circular linked list to accommodate more elements if
+   * needed.
+   */
+  void resize() {}
+
+  /**
+   * @brief Clears the circular linked list.
+   *
+   * @pre None
+   * @post Removes all elements from the circular linked list.
+   */
+  void clear() {}
+
+  /**
+   * @brief Inserts a new element into the circular linked list.
+   *
+   * @pre None
+   * @post Inserts a new element into the circular linked list.
+   */
+  void insert() {}
+
+  /**
+   * @brief Removes an element from the circular linked list.
+   *
+   * @pre None
+   * @post Removes an element from the circular linked list.
+   */
+  void remove() {}
+};
+} // namespace CIRCULARLINKEDLIST
+namespace HASHMAP {
+using namespace ASSOCIATIVEARRAY;
+typedef AssociativeArray<class DataType_A, class DataType_B> Array;
+struct HashMap : public Array {
+  float load_factor = 0.00;
+  Index Hashing() {
+    Index desired_location = size() % capacity();
+    return static_cast<Index>(desired_location);
+  } // todo implement
+  void Rehashing() {} // todo implement
+};
+} // namespace HASHMAP
 #endif // LINKED_LIST_H

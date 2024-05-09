@@ -1,0 +1,28 @@
+void heapify(LINKEDLIST::Linked_List<datatype_K> &list, size_t index) {
+    size_t largest = index, left = (2 * index) + 1, right = (2 * index) + 2;
+
+    // Compare node with left child
+    if (left < list.size() && list.get_node(left)->value->data >
+                                  list.get_node(largest)->value->data) {
+      largest = left;
+    }
+
+    // Compare largest so far with right child
+    if (right < list.size() && list.get_node(right)->value->data >
+                                   list.get_node(largest)->value->data) {
+      largest = right;
+    }
+
+    // If largest is not the current node, swap and continue heapifying
+    if (largest != index) {
+      list.swap(index, largest);
+      heapify(list,
+              largest); // Call heapify on the child index that was swapped
+    }
+  }
+
+
+
+Fun problems to try tackle:
+
+Caculate the 500th term of the fib sequence, utilze a associative array to compute the values

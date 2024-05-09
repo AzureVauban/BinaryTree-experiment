@@ -3,68 +3,114 @@
 
 #include "LinkedList.h"
 #include <cstddef>
-namespace QUEUE {
-template <class datatype_T> struct Queue {
-private:
-  LINKEDLIST::Linked_List<datatype_T> linkedQueue;
+#include <cstdio>
 
-public:
-  void Enqueue(datatype_T value) { linkedQueue.insert(value); }
+namespace LINKEDQUEUE {
+template <class datatype_V> struct Queue {
+  typedef datatype_V Value;
+  typedef size_t Index;
+  LINKEDLIST::Linked_List<Value> Array;
 
-  void Dequeue() {
-    if (!IsEmpty()) {
-      linkedQueue.remove(0);
-    }
+  explicit Queue() : Array(LINKEDLIST::Linked_List<Value>()) {}
+
+  // Enqueues a value into the queue
+  //
+  // Pre-condition: The value to be enqueued is of type Value
+  //
+  // Post-condition: The value is added to the end of the queue
+  void enqueue(const Value value) {
+    // Index i = (Array.size() > 0) ? Array.size() - 1 : 0;
+    //,(Array.size() > 0) ? Array.size() - 1 : 0
+    Array.insert(value);
   }
 
-  datatype_T Peek() {
-    if (IsEmpty()) {
-      return datatype_T();
+  // Dequeues a value from the queue
+  //
+  // Pre-condition: The queue is not empty
+  //
+  // Post-condition: The value at the front of the queue is removed
+  void dequeue() { Array.remove(0); }
+  
+  // Returns the value at the front of the queue without removing it
+  //
+  // Pre-condition: The queue is not empty
+  //
+  // Post-condition: The value at the front of the queue is returned
+  Value Peek() const {
+    if (Array.isempty()) {
+      return Value();
     }
-    return linkedQueue.get_node(0)->value;
+    return Array.at(0);
   }
 
-  bool IsEmpty() { return linkedQueue.isempty(); }
-
-  size_t Size() const { return linkedQueue.size(); }
-  ~Queue() {
-    while (!linkedQueue.isempty()) {
-      linkedQueue.remove();
-    }
+  bool value_exists(const Value value) {
+    return Array.in(value);
   }
+  // Returns the number of elements in the queue
+  //
+  // Pre-condition: None
+  //
+  // Post-condition: The number of elements in the queue is returned
+  size_t Size() const { return Array.size(); }
+
+  // Checks if the queue is empty
+  //
+  // Pre-condition: None
+  //
+  // Post-condition: Returns true if the queue is empty, false otherwise
+  bool isEmpty() const { return Array.isempty(); }
+
+  // Clears the queue
+  //
+  // Pre-condition: None
+  //
+  // Post-condition: The queue is empty
+  void clear() { Array.clear(); }
+
+  typedef std::ostream os;
+  // Overloads the << operator to print the Queue
+  //
+  // Pre-condition: The output stream is valid and open, and the associative
+  // array is a valid AssociativeArray object
+  //
+  // Post-condition: Prints the Queue to the output stream and
+  // returns the stream
+  friend os &operator<<(os &output, const Queue &Queue) {
+    output << Queue.Array;
+    return output;
+  }
+  ~Queue() { Array.clear(); }
 };
-} // namespace QUEUE
-namespace PRIORITY_QUEUE {
-template <class datatype_K> struct PriorityQueue { // UNTESTED
-private:
-  template <class datatype_N> struct PriorityQueueNode {
-    size_t priority;
-    datatype_N value;
-
-    explicit PriorityQueueNode(size_t priority, datatype_N value)
-        : priority(priority), value(value) {}
+} // namespace LINKEDQUEUE
+namespace PRIORITYQUEUE {
+template <class datatype_V> struct PriorityQueue {
+  typedef datatype_V Value;
+  typedef size_t Index;
+  typedef size_t Priority;
+  LINKEDLIST::Linked_List<Value> Array;
+  struct PriorityQueueNode {
+    Priority priority;
+    const Value value;
+    PriorityQueueNode(const Value &value, Priority priority)
+        : value(value), priority(priority) {}
   };
 
-  LINKEDLIST::Linked_List<PriorityQueueNode<datatype_K>> Heap;
+  typedef PriorityQueueNode Node;
+  explicit PriorityQueue() : Array(LINKEDLIST::Linked_List<Node>()) {}
 
-  datatype_K Peek() {
-    if (IsEmpty()) {
-      return datatype_K();
-    }
-    return Heap.get_node(0)->value;
-  }
-  void heapify(LINKEDLIST::Linked_List<datatype_K> &list, size_t index) {
-    size_t largest = index, left = (2 * index) + 1, right = (2 * index) + 2;
+private:
+  void heapify(LINKEDLIST::Linked_List<Node> &list, Index index) {
+    Index largest = index, left = (2 * index) + 1, right = (2 * index) + 2;
 
     // Compare node with left child
-    if (left < list.size() && list.get_node(left)->value->data >
-                                  list.get_node(largest)->value->data) {
+    if (left < list.size() &&
+        list.at(left)->value->data > list.at(largest)->value->data) {
       largest = left;
     }
 
     // Compare largest so far with right child
-    if (right < list.size() && list.get_node(right)->value->data >
-                                   list.get_node(largest)->value->data) {
+    if (right < list.size() &&
+        list.at(right)->value->data > list.at(largest)->value->data) {
       largest = right;
     }
 
@@ -77,21 +123,19 @@ private:
   }
 
 public:
-  bool IsEmpty() { return Heap.isempty(); }
-
-  size_t Size() { return Heap.size(); }
-
-  void Enqueue(datatype_K value, size_t priority) {
-    Heap.insert(value);
-    heapify(Heap, 0);
+  void enqueue(const Value value, const Priority priority) {
+    Array.insert(Node(value, priority));
+  };
+  void dequeue() { Array.remove(0); }
+  size_t Size() const { return Array.size(); }
+  bool isEmpty() const { return Array.isempty(); }
+  void clear() { Array.clear(); }
+  typedef std::ostream os;
+  friend os &operator<<(os &output, const PriorityQueue &Queue) {
+    output << Queue.Array;
+    return output;
   }
-
-  void Dequeue() {
-    if (!IsEmpty()) {
-      Heap.remove(0);
-      heapify(Heap, 0);
-    }
-  }
+  ~PriorityQueue() { Array.clear(); }
 };
-}; // namespace PRIORITY_QUEUE
+} // namespace PRIORITYQUEUE
 #endif // QUEUE_H

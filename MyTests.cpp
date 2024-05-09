@@ -1,12 +1,15 @@
 #include "HiddenTests.h"
 #include "LinkedList.h"
+#include "Queue.h"
 #include <cassert>
 #include <cstddef>
 #include <cstdlib>
+#include <float.h>
 #include <iostream>
 #include <string>
 
-template <typename R> R choose_random(LINKEDLIST::Linked_List<R> &RList) {
+template <typename Rvalue>
+Rvalue choose_random(const LINKEDLIST::Linked_List<Rvalue> &RList) {
   return RList.at(randomBetween(0, RList.size() - 1));
 }
 template <typename T> class LinkedListUnitTest {
@@ -227,12 +230,12 @@ template <class Key, class Value> class AssociativeArrayUnitTest {
         std::cout << Array << std::endl;
       }
       // std::cout << "CURRENT SIZE: " << Array.size() << std::endl;
-      // std::cout << "DESIRED SIZE: " << o << std::endl;
-      // if (Array.isfull()) {
-      //  std::cout << "ARRAY IS FULL...RESIZING TO " << Array.size()*2 <<
-      //  std::endl;
-      // Array.resize(Array.size() * 2);
-      //}
+      // std::cout << "DESIRED SIZE: " <<  << std::endl;
+      if (Array.isfull()) {
+        std::cout << "ARRAY IS FULL...RESIZING TO " << Array.size() * 2
+                  << std::endl;
+        Array.resize(Array.size() * 2);
+      }
       test_insert(Array, choose_random(Keys), choose_random(Values));
     }
     const bool test_sucess = Array.isfull();
@@ -268,11 +271,11 @@ template <class Key, class Value> class AssociativeArrayUnitTest {
   bool test_resize(Array &Array, const bool decreasesize = false,
                    const bool debugout = false) {
     // const bool isfull = Map.isfull(); only for debug
-    // if (decreasesize) {
-    //  std::cout << "ATTEMPTING TO DECREASE THE SIZE OF ARRAY\n";
-    //} else {
-    //  std::cout << "ATTEMPTING TO INCREASE THE SIZE OF ARRAY\n";
-    //}
+    if (decreasesize) {
+      std::cout << "ATTEMPTING TO DECREASE THE SIZE OF ARRAY\n";
+    } else {
+      std::cout << "ATTEMPTING TO INCREASE THE SIZE OF ARRAY\n";
+    }
     const size_t old_capacity = Array.capacity();
     size_t new_capacity = old_capacity;
     if (decreasesize) {
@@ -305,6 +308,7 @@ template <class Key, class Value> class AssociativeArrayUnitTest {
     }
     return test_success;
   }
+
   void UnitTests(Array &Array, TestKeys &Keys, TestValues &Values,
                  size_t TESTCASE) {
     std::cout << "TESTCASE: " << TESTCASE << std::endl;
@@ -312,8 +316,8 @@ template <class Key, class Value> class AssociativeArrayUnitTest {
       std::cout << '=';
     }
     std::cout << std::endl;
-    //!    std::cout << "KEYS: " << Keys << std::endl;
-    //!    std::cout << "VALUES: " << Values << std::endl;
+    std::cout << "VALUES: " << Values << std::endl;
+    std::cout << "KEYS: " << Keys << std::endl;
     assert(test_isempty(Array));
     for (size_t index = 0; index < Keys.size(); index++) {
       assert(!test_keyexists(Array, Keys[index]));
@@ -329,13 +333,12 @@ template <class Key, class Value> class AssociativeArrayUnitTest {
               << "CAPACITY: " << Array.capacity() << std::endl;
     std::cout << Array << std::endl;
     std::cout << std::endl;
-    assert(test_resize(Array, true, true)); // resize to smaller
-    // assert(test_isfull(Array, Keys, Values, true));
-    Key chosen_key = choose_random(Keys);
-    do {
-      assert(test_remove(Array, chosen_key, true));
-      chosen_key = choose_random(Keys);
-    } while (!Array.key_exists(chosen_key));
+    assert(test_resize(Array, true, true)); // resize to smaller'
+    Array.shrink_to_fit();
+    std::cout << Array << std::endl;
+    Array.clear();
+    std::cout << Array << std::endl;
+    assert(Array.isempty());
   }
 
 public:
@@ -344,6 +347,88 @@ public:
     UnitTests(Map, Keys, Values, TESTCASE);
   }
   ~AssociativeArrayUnitTest() {}
+};
+
+template <class Value> class QueueUnitTest {
+  typedef LINKEDQUEUE::Queue<Value> Queue;
+  typedef LINKEDLIST::Linked_List<Value> TestValuesList;
+
+  bool test_isempty(const Queue &Test) {
+    bool test_successful = Test.isEmpty();
+    if (test_successful) {
+      std::cout << "QUEUE IS EMPTY" << std::endl;
+    } else {
+      std::cout << "QUEUE HAS A SIZE OF " << Test.Size() << std::endl;
+    }
+    return test_successful;
+  }
+  bool test_enqueue(Queue &Test, const Value value) {
+    bool test_successful = true;
+    size_t old_size = Test.Size();
+    // std::cout << "QUEUE: " << Test << std::endl;
+    Test.enqueue(value);
+    test_successful = Test.Size() == old_size + 1 && Test.value_exists(value);
+    if (test_successful) {
+      std::cout << " SUCCESSFULLY ENQUEUED " << value << std::endl;
+    } else {
+      std::cout << "WAS UNABLE TO ENQUEUE " << value << std::endl;
+    }
+    std::cout << "QUEUE: " << Test << std::endl << std::endl;
+    return test_successful;
+  }
+  bool test_dequeue(Queue &Test) {
+    if (Test.isEmpty()) {
+      std::cout << "TEST QUEUE IS EMPTY, SKIPPING TEST\n";
+      return true;
+    }
+    const Value dequeue_value = Test.Peek();
+    std::cout << "QUEUE: " << Test << std::endl;
+    size_t old_size = Test.Size();
+    Test.dequeue();
+    bool test_successful = Test.Size() == old_size - 1;
+    if (test_successful) {
+      std::cout << "SUCCESSFULLY DEQUEUED " << dequeue_value
+                << " FROM THE QUEUE" << std::endl;
+    } else {
+      std::cout << "UNABLE TO SUCCESSFULLY DEQUEUED " << dequeue_value
+                << "FROM THE QUEUE" << std::endl;
+    }
+    // std::cout << "QUEUE: " << Test << std::endl;
+    return test_successful;
+  }
+  bool test_clear(Queue &Test) {
+    std::cout << "CLEARING QUEUE OF " << Test.Size() << " VALUES" << std::endl;
+    std::cout << "QUEUE: " << Test << std::endl;
+    Test.clear();
+    bool test_successful = Test.isEmpty();
+    if (test_successful) {
+      std::cout << "SUCCESSFULLY EMPTIED THE QUEUE" << std::endl;
+    } else {
+      std::cout << "UNABLE TO EMPTY THE QUEUE" << std::endl;
+    }
+    return test_successful;
+  }
+
+public:
+  void runtest(Queue &Test, const TestValuesList &List) {
+    assert(test_isempty(Test));
+    for (int i = 0; i < randomBetween(0, List.size()); i++) {
+      assert(test_enqueue(Test, choose_random(List)));
+    }
+    assert(test_dequeue(Test));
+    assert(test_clear(Test));
+  }
+
+  explicit QueueUnitTest(Queue &Test, const TestValuesList &Values,
+                         const size_t TESTCASE) {
+    std::cout << "TESTCASE: " << TESTCASE << std::endl;
+    for (int i = 0; i != 80; i++) {
+      std::cout << '=';
+    }
+    std::cout << std::endl;
+    runtest(Test, Values);
+    std::cout << std::endl;
+  }
 };
 // template <class Key, class Value> class HashMapUnitTest {
 //   // implement as a complete binary tree of buckets
@@ -444,8 +529,9 @@ public:
 //   };
 //   ~HashMapUnitTest() {}
 // };
+
 int main() {
-  const static int TESTCASES = 100;
+  const static int TESTCASES = 5000;
   // using namespace HASHMAP;
 
   for (size_t i = 0; i < TESTCASES; i++) {
@@ -464,25 +550,12 @@ int main() {
     AssociativeArrayUnitTest<std::string, int> myTests(Array, strings, numbers,
                                                        i);
   }
-  ASSOCIATIVEARRAY::AssociativeArray<int, int> BinetArray(5, 100);
-  for (int i = 0; i < 100; i++) {
-    BinetArray.insert(i, randomBetween(0, 1000));
-    if (BinetArray.isfull()) {
-      BinetArray.resize(BinetArray.size() + 10);
-    }
+  for (size_t i = 0; i < TESTCASES; i++) {
+    // break; //! COMMENT OUT TO ENABLE TEST
+    LINKEDLIST::Linked_List<int> numbers = GenerateIntList(25);
+    LINKEDQUEUE::Queue<int> NumsQueue;
+    QueueUnitTest<int> myQueueTests(NumsQueue, numbers, i);
   }
-  BinetArray.shrink_to_fit();
-  std::cout << BinetArray << std::endl;
-  std::cout << BinetArray[3] << std::endl;
-  //! COMMENTED OUT BECAUSE HASH MAP WILL INHEIRTED FROM A_ARRAY CLASS
-  //! for (size_t i = 0; i < TESTCASES; i++) {
-  //!   LINKEDLIST::Linked_List<std::string> testkeys =
-  //!       GenerateRandomStringList(20);
-  //!   LINKEDLIST::Linked_List<int> testvalues = GenerateIntList(30);
-  //!   // std::cout << HashMap<std::string, int>() << std::endl;
-  //!   HashMapUnitTest<std::string, int> hashMapUnitTest(
-  //!       HashMap<std::string, int>(), testkeys, testvalues, i);
-  //! }
   std::cout << "TERMINATING PROCESS" << std::endl;
   return 0;
 }
